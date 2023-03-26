@@ -40,10 +40,10 @@ local function quarry(mover, length, width, height, fw)
         doEachMove:func(mover)
         mover:walkRectangle(length, width, true, doEachMove)
         if evenWidth then
-            mover:right()
-            mover:right()
+            mover:turnRight()
+            mover:turnRight()
         else
-            mover:right()
+            mover:turnRight()
             -- Swap length and width since we have changed orientation
             local temp = length
             length = width
