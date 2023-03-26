@@ -93,7 +93,7 @@ function Mover:down(breakBlock)
         self.log:error(err)
         return false
     end
-    self.pos = self.pos + DirectionVectors[Direction.UP]
+    self.pos = self.pos + Direction.Vectors[Direction.UP]
     return true
 end
 
@@ -119,7 +119,7 @@ function Mover:up(breakBlock)
         self.log:error(err)
         return false
     end
-    self.pos = self.pos + DirectionVectors[Direction.DOWN]
+    self.pos = self.pos + Direction.Vectors[Direction.DOWN]
     return true
 end
 
@@ -145,7 +145,7 @@ function Mover:forward(breakBlock)
         self.log:error(err)
         return false
     end
-    self.pos = self.pos + DirectionVectors[self.direction]
+    self.pos = self.pos + Direction.Vectors[self.direction]
     return true
 end
 
@@ -159,10 +159,9 @@ function Mover:turnLeft()
         return false
     end
 
-    self.direction = self.direction - 1;
-    if self.direction < Direction.NORTH then
-        self.direction = Direction.WEST
-    end
+    local d = math.fmod(self.direction - 1, 5)
+    if d == 0 then self.direction = 4 else self.direction = d end
+    self.log:debug(string.format('Now faceing %s', Direction.Names[self.direction]))
     return true
 end
 
@@ -174,15 +173,15 @@ function Mover:turnRight()
         return false
     end
 
-    self.direction = self.direction + 1;
-    if self.direction < Direction.WEST then
-        self.direction = Direction.NORTH
-    end
+    local d = math.fmod(self.direction + 1, 5)
+    if d == 0 then self.direction = 1 else self.direction = d end
+    self.log:debug(string.format('Now faceing %s', Direction.Names[self.direction]))
+
     return true
 end
 
 function Mover:faceDirection(targetDir)
-    self.log:debug('Turning from %s to %s', DirectionNames[self.direction], DirectionNames[targetDir])
+    self.log:debug('Turning from %s to %s', Direction.Names[self.direction], Direction.Names[targetDir])
     local delta = targetDir - self.direction
     if delta == 1 or delta == -3 then
         self:turnRight()
