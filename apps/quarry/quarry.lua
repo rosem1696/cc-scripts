@@ -1,7 +1,6 @@
 local turtleMover = require('turtleMover')
 local inv = require('turtleInventory')
-
-local tm = turtleMover.Mover:new()
+local log = require('log')
 
 local doEachMove = {}
 
@@ -18,33 +17,33 @@ function doEachMove:func(mover)
             local returnPosition = mover.pos
 
             -- return to chest location
-            tm:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.YXZ)
-            tm:faceDirection(turtleMover.Direction.NORTH)
+            mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.YXZ)
+            mover:faceDirection(turtleMover.Direction.NORTH)
 
             -- empty inventory
             inv.dropRange(2, 16)
 
             -- return to last position
-            tm:goToPosition(returnPosition, true, turtleMover.MovementOrder.ZXY)
-            tm:faceDirection(returnDirection)
+            mover:goToPosition(returnPosition, true, turtleMover.MovementOrder.ZXY)
+            mover:faceDirection(returnDirection)
         end
     end
 end
 
-local function quarry(length, width, height, fw)
+local function quarry(mover, length, width, height, fw)
     local evenWidth = math.fmod(width, 2) == 0
-    tm:lineForward(fw, true)
-    tm:down(true)
-    doEachMove:func(tm)
+    mover:lineForward(fw, true)
+    mover:down(true)
+    doEachMove:func(mover)
     for i = 1, height do
-        tm:lineVertical(-3, true)
-        doEachMove:func(tm)
-        tm:walkRectangle(length, width, true, doEachMove)
+        mover:lineVertical(-3, true)
+        doEachMove:func(mover)
+        mover:walkRectangle(length, width, true, doEachMove)
         if evenWidth then
-            tm:right()
-            tm:right()
+            mover:right()
+            mover:right()
         else
-            tm:right()
+            mover:right()
             -- Swap length and width since we have changed orientation
             local temp = length
             length = width
@@ -70,17 +69,26 @@ local function getArgs()
     input = io.read('l')
     local fw = tonumber(input)
 
-    return length, width, height, fw
+    print('<Y/N> Use Debug Logging? - Default: N')
+    input = io.read('l')
+    local useDebug = input == 'Y' or input == 'y'
+
+    return length, width, height, fw, useDebug
 end
 
 local function main()
     print('Starting Custom Quarry')
 
-    local length, width, height, fw = getArgs()
+    local length, width, height, fw, useDebug = getArgs()
+
+    local logLevel = log.LogLevel.ERROR
+    if useDebug then logLevel = log.LogLevel.DEBUG end
+
+    local mover = turtleMover.Mover:new(logLevel)
 
     print(string.format('Beginning quarry of size %d x %d x %d', length, width, height))
 
-    quarry(length, width, height, fw)
+    quarry(mover, length, width, height, fw)
 end
 
 main()
