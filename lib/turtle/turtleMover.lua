@@ -81,10 +81,10 @@ function Mover:down(breakBlock)
                 self.log:error(err)
                 return false
             end
+        else
+            self.log:error('path down blocked, cannot move')
+            return false
         end
-
-        self.log:error('path down blocked, cannot move')
-        return false
     end
 
     self.log:debug('moving down')
@@ -107,10 +107,10 @@ function Mover:up(breakBlock)
                 self.log:error(err)
                 return false
             end
+        else
+            self.log:error('path up blocked, cannot move')
+            return false
         end
-
-        self.log:error('path up blocked, cannot move')
-        return false
     end
 
     self.log:debug('moving up')
@@ -133,10 +133,10 @@ function Mover:forward(breakBlock)
                 self.log:error(err)
                 return false
             end
+        else
+            self.log:error('path forward blocked, cannot move')
+            return false
         end
-
-        self.log:error('path forward blocked, cannot move')
-        return false
     end
 
     self.log:debug('moving forward')
