@@ -181,7 +181,7 @@ function Mover:turnRight()
 end
 
 function Mover:faceDirection(targetDir)
-    self.log:debug('Turning from %s to %s', Direction.Names[self.direction], Direction.Names[targetDir])
+    self.log:debug(string.format('Turning from %s to %s', Direction.Names[self.direction], Direction.Names[targetDir]))
     local delta = targetDir - self.direction
     if delta == 1 or delta == -3 then
         self:turnRight()
