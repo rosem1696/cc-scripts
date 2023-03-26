@@ -6,8 +6,8 @@ local tm = turtleMover.Mover:new()
 local doEachMove = {}
 
 function doEachMove:func(mover)
-    turtle:digDown()
-    turtle:digUp()
+    turtle.digDown()
+    turtle.digUp()
 
     -- check inventory
     if inv.isInventoryFull() then
