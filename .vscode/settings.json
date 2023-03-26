@@ -1,0 +1,16 @@
+{
+  "Lua.diagnostics.neededFileStatus": {
+    "codestyle-check": "Any"
+  },
+  "Lua.diagnostics.globals": [
+    "turtle",
+    "write",
+    "rednet",
+    "t",
+    "printError",
+    "sleep",
+    "vector",
+    "fs",
+    "http"
+  ]
+}
