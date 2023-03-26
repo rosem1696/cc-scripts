@@ -88,7 +88,12 @@ local function quarry(mover, length, width, height, fw)
         length, width = digPlane(mover, length, width)
     end
 
-    -- TODO return to origin and dump contents
+    -- return to origin and dump inventory
+    mover:goToPosition(doEachMove.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
+    mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.YXZ)
+    mover:faceDirection(turtleMover.Direction.SOUTH)
+    inv.dropRange(2, 16)
+    mover:faceDirection(turtleMover.Direction.NORTH)
 end
 
 local function getArgs()
@@ -128,6 +133,8 @@ local function main()
     print(string.format('Beginning quarry of size %d x %d x %d', length, width, height))
 
     quarry(mover, length, width, height, fw)
+
+    print('Finished digging quarry!')
 end
 
 main()
