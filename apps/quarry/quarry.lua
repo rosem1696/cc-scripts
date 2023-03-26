@@ -78,7 +78,7 @@ local function main()
 
     local length, width, height, fw = getArgs()
 
-    print('Beginning quarry of size %d x %d x %d', length, width, height)
+    print(string.format('Beginning quarry of size %d x %d x %d', length, width, height))
 
     quarry(length, width, height, fw)
 end
