@@ -57,7 +57,7 @@ end
 
 local function quarry(mover, length, width, height, fw)
     mover:lineForward(fw, true)
-    doEachMove.quarryOrigin = mover.position + turtleMover.Direction.Vectors[turtleMover.Direction.DOWN]
+    doEachMove.quarryOrigin = mover.pos + turtleMover.Direction.Vectors[turtleMover.Direction.DOWN]
     local i = 0
 
     -- Handle special case for first row since we start one block lower than
