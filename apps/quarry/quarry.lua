@@ -38,7 +38,7 @@ local function quarry(length, width, height, fw)
     doEachMove:func(tm)
     for i = 1, height do
         tm:lineVertical(-3, true)
-        doEachMove(tm)
+        doEachMove:func(tm)
         tm.walkRectangle(length, width, true, doEachMove)
         if evenWidth then
             tm:right()

@@ -23,7 +23,7 @@ function Logger:addPrefix(msg)
     if self.prefix == '' then
         return msg
     end
-    return string.format('%s: %s', self.prefix)
+    return string.format('%s: %s', self.prefix, msg)
 end
 
 function Logger:error(msg)
