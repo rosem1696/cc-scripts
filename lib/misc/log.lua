@@ -19,7 +19,7 @@ function Logger:new(prefix, level)
     return o
 end
 
-function Logger:prefix(msg)
+function Logger:addPrefix(msg)
     if self.prefix == '' then
         return msg
     end
@@ -28,19 +28,19 @@ end
 
 function Logger:error(msg)
     if self.logLevel >= LogLevel.ERROR then
-        printError(self.prefix(msg))
+        printError(self:addPrefix(msg))
     end
 end
 
 function Logger:info(msg)
     if self.logLevel >= LogLevel.INFO then
-        print(self.prefix(msg))
+        print(self:addPrefix(msg))
     end
 end
 
 function Logger:debug(msg)
     if self.logLevel >= LogLevel.DEBUG then
-        print(self.prefix(msg))
+        print(self:addPrefix(msg))
     end
 end
 
