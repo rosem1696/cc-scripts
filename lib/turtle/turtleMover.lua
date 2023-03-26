@@ -93,7 +93,7 @@ function Mover:down(breakBlock)
         self.log:error(err)
         return false
     end
-    self.pos = self.pos + Direction.Vectors[Direction.UP]
+    self.pos = self.pos + Direction.Vectors[Direction.DOWN]
     return true
 end
 
@@ -119,7 +119,7 @@ function Mover:up(breakBlock)
         self.log:error(err)
         return false
     end
-    self.pos = self.pos + Direction.Vectors[Direction.DOWN]
+    self.pos = self.pos + Direction.Vectors[Direction.UP]
     return true
 end
 
