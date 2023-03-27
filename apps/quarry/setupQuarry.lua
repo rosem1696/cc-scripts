@@ -17,6 +17,7 @@ local function main()
     download('turtleMover', 'lib/turtle')
     download('turtleInventory', 'lib/turtle')
     download('log', 'lib/misc')
+    download('userPrompt', 'lib/misc')
 
     download('quarry', 'apps/quarry')
 

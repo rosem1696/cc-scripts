@@ -1,6 +1,7 @@
 local turtleMover = require('turtleMover')
 local inv = require('turtleInventory')
 local log = require('log')
+local prompt = require('userPrompt')
 
 local doEachMove = {
     -- Used for handling the initial case if only digging 1 or 2 lines
@@ -24,7 +25,7 @@ function doEachMove:func(mover)
 
             -- return to chest location
             mover:goToPosition(self.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
-            mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.YXZ)
+            mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.ZXY)
             mover:faceDirection(turtleMover.Direction.SOUTH)
 
             -- empty inventory
@@ -55,22 +56,20 @@ local function digPlane(mover, length, width)
     end
 end
 
-local function quarry(mover, length, width, height, fw)
-    mover:lineForward(fw, true)
-    doEachMove.quarryOrigin = mover.pos + turtleMover.Direction.Vectors[turtleMover.Direction.DOWN]
+local function quarry(mover, length, width, height, quarryOrigin)
+    doEachMove.quarryOrigin = quarryOrigin
+    mover:goToPosition(quarryOrigin, true, turtleMover.MovementOrder.YXZ)
     local i = 0
 
-    -- Handle special case for first row since we start one block lower than
-    --  after finishing an iteration.
+    -- Handle special case for first row since we start one block lower than after finishing an iteration.
     -- Also handle quarry of height 1 or 2
     if height == 1 or height == 2 then
-        mover:lineVertical(-1, true)
         doEachMove.breakBlockUp = false
         doEachMove.breakBlockDown = height == 2
         i = height
         digPlane(mover, length, width)
     else
-        mover:lineVertical(-2, true)
+        mover:lineVertical(-1, true)
         i = 3
         length, width = digPlane(mover, length, width)
     end
@@ -97,42 +96,38 @@ local function quarry(mover, length, width, height, fw)
 end
 
 local function getArgs()
-    print('Enter length')
-    local input = io.read('l')
-    local length = tonumber(input)
+    -- Prompt for quarry size
+    print('Prompt for quarry size\n')
+    local length = prompt.getNumber('Select quarry length \n\t(blocks to dig forward from the turtle)', nil, 0, nil)
+    local width = prompt.getNumber('Select quarry width \n\t(distance in direction right from the turtle)', nil, 0, nil)
+    local height = prompt.getNumber('Select quarry height \n\t(distance to dig down from the turtle)', nil, 0, nil)
 
-    print('Enter width')
-    input = io.read('l')
-    local width = tonumber(input)
+    -- Promt for origin point
+    print('Prompt for quarry origin point \n\t(Upper South West corner of the quarry)\n')
+    local dz = prompt.getNumber('Select Z coordinate \n\t(forward from the turtle)', 0, 0, nil) -- forward from turtle is actually -Z, invert done for simplicity
+    local dx = prompt.getNumber('Select X coordinate \n\t(positive is right from the turtle)', 0, nil, nil)
+    local dy = prompt.getNumber('Select Y coordinate \n\t(positive is up from the turtle)', 0, nil, nil)
 
-    print('Enter height')
-    input = io.read('l')
-    local height = tonumber(input)
+    local useDebug = prompt.getYesNo('Use Debug Logging?', false)
 
-    print('Enter blocks to move forward before starting')
-    input = io.read('l')
-    local fw = tonumber(input)
-
-    print('<Y/N> Use Debug Logging? - Default: N')
-    input = io.read('l')
-    local useDebug = input == 'Y' or input == 'y'
-
-    return length, width, height, fw, useDebug
+    dz = dz * -1 -- Invert entered Z
+    return length, width, height, vector.new(dx, dy, dz), useDebug
 end
 
 local function main()
     print('Starting Custom Quarry')
 
-    local length, width, height, fw, useDebug = getArgs()
+    local length, width, height, origin, useDebug = getArgs()
 
     local logLevel = log.LogLevel.ERROR
     if useDebug then logLevel = log.LogLevel.DEBUG end
 
     local mover = turtleMover.Mover:new(logLevel)
 
-    print(string.format('Beginning quarry of size %d x %d x %d', length, width, height))
+    print(string.format('Beginning quarry of size %d x %d x %d at <%d, %d, %d>', length, width, height, origin.x,
+        origin.y, origin.z))
 
-    quarry(mover, length, width, height, fw)
+    quarry(mover, length, width, height, origin)
 
     print('Finished digging quarry!')
 end
