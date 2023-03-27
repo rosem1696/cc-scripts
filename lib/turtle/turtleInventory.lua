@@ -79,4 +79,38 @@ function inv.dropRange(startSlot, endSlot)
     end
 end
 
+-- Returns true if any fuel was added
+-- Returns the amount of fuel added
+function inv.refuelAny()
+    local currentFuel = turtle.getFuelLevel()
+    if currentFuel == turtle.getFuelLimit() then
+        return true, 0
+    end
+    for i = 1, 16 do
+        turtle.select(i)
+        if turtle.refuel(1) then
+            return true, turtle.getFuelLevel - currentFuel
+        end
+    end
+    return false, 0
+end
+
+-- Returns true if fuel was added or already at maximum
+-- Returns the amount of fuel added to the new driving force
+function inv.refuelAll()
+    local currentFuel = turtle.getFuelLevel()
+    if currentFuel == turtle.getFuelLimit() then
+        return true, 0
+    end
+    for i = 1, 16 do
+        turtle.select(i)
+        turtle.refuel()
+        if turtle.getFuelLevel() == turtle.getFuelLimit() then
+            return true, turtle.getFuelLevel() - currentFuel
+        end
+    end
+    local amount = turtle.getFuelLevel() - currentFuel
+    return amount > 0, amount
+end
+
 return inv;
