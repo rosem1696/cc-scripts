@@ -32,7 +32,7 @@ function doEachMove:func(mover)
             inv.dropRange(2, 16)
 
             -- return to last position
-            mover:goToPosition(self.quarryOrigin, true, turtleMover.MovementOrder.ZXY)
+            mover:goToPosition(self.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
             mover:goToPosition(returnPosition, true, turtleMover.MovementOrder.ZXY)
             mover:faceDirection(returnDirection)
         end
@@ -89,7 +89,7 @@ local function quarry(mover, length, width, height, quarryOrigin)
 
     -- return to origin and dump inventory
     mover:goToPosition(doEachMove.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
-    mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.YXZ)
+    mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.ZXY)
     mover:faceDirection(turtleMover.Direction.SOUTH)
     inv.dropRange(2, 16)
     mover:faceDirection(turtleMover.Direction.NORTH)
