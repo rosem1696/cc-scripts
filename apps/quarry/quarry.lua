@@ -116,6 +116,7 @@ end
 
 local function main()
     print('Starting Custom Quarry')
+    print('====================')
 
     local length, width, height, origin, useDebug = getArgs()
 
