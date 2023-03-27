@@ -20,12 +20,12 @@ function userPrompt.getNumber(description, default, min, max)
             write('Enter number: ')
         end
 
-        print('')
-
         local input = io.read('l')
         if input == '' and default then
             return default
         end
+
+        print('')
 
         local inputNum = tonumber(input)
         if not inputNum then
@@ -63,7 +63,7 @@ function userPrompt.getYesNo(description, default)
         elseif input == 'n' or input == 'N' then
             return false
         else
-            print('Input is invalid')
+            printError('Input is invalid')
         end
 
         print('')
