@@ -3,7 +3,15 @@ local inv = require('turtleInventory')
 local log = require('log')
 local prompt = require('userPrompt')
 
-local doEachMove = {
+-- Dig the pathway 2 blocks tall
+local doEachMovePath = {
+    func = function ()
+        turtle.digDown()
+    end
+}
+
+
+local doEachMoveQuarry = {
     -- Used for handling the initial case if only digging 1 or 2 lines
     breakBlockUp = true,
     breakBlockDown = true,
@@ -11,7 +19,7 @@ local doEachMove = {
     quarryOrigin = vector.new(0, 0, 0)
 }
 
-function doEachMove:func(mover)
+function doEachMoveQuarry:func(mover)
     if self.breakBlockDown then turtle.digDown() end
     if self.breakBlockUp then turtle.digUp() end
 
@@ -40,8 +48,8 @@ function doEachMove:func(mover)
 end
 
 local function digPlane(mover, length, width)
-    doEachMove:func(mover)
-    mover:walkRectangle(length, width, true, doEachMove)
+    doEachMoveQuarry:func(mover)
+    mover:walkRectangle(length, width, true, doEachMoveQuarry)
 
     -- Handle ending orientation being different
     if math.fmod(width, 2) == 0 then
@@ -57,15 +65,15 @@ local function digPlane(mover, length, width)
 end
 
 local function quarry(mover, length, width, height, quarryOrigin)
-    doEachMove.quarryOrigin = quarryOrigin
-    mover:goToPosition(quarryOrigin, true, turtleMover.MovementOrder.YXZ)
+    doEachMoveQuarry.quarryOrigin = quarryOrigin
+    mover:goToPosition(quarryOrigin, true, turtleMover.MovementOrder.YXZ, doEachMovePath)
     local i = 0
 
     -- Handle special case for first row since we start one block lower than after finishing an iteration.
     -- Also handle quarry of height 1 or 2
     if height == 1 or height == 2 then
-        doEachMove.breakBlockUp = false
-        doEachMove.breakBlockDown = height == 2
+        doEachMoveQuarry.breakBlockUp = false
+        doEachMoveQuarry.breakBlockDown = height == 2
         i = height
         digPlane(mover, length, width)
     else
@@ -88,7 +96,7 @@ local function quarry(mover, length, width, height, quarryOrigin)
     end
 
     -- return to origin and dump inventory
-    mover:goToPosition(doEachMove.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
+    mover:goToPosition(doEachMoveQuarry.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
     mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.ZXY)
     mover:faceDirection(turtleMover.Direction.SOUTH)
     inv.dropRange(2, 16)
