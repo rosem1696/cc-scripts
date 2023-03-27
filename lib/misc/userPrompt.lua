@@ -21,11 +21,11 @@ function userPrompt.getNumber(description, default, min, max)
         end
 
         local input = io.read('l')
+        print('')
+
         if input == '' and default then
             return default
         end
-
-        print('')
 
         local inputNum = tonumber(input)
         if not inputNum then
@@ -53,9 +53,9 @@ function userPrompt.getYesNo(description, default)
             write('Enter y/n: ')
         end
 
+        local input = io.read('l')
         print('')
 
-        local input = io.read('l')
         if input == '' and default ~= nil then
             return default
         elseif input == 'y' or input == 'Y' then
