@@ -288,9 +288,9 @@ function Mover:translate(tVec, breakBlock, order, doEachMove)
     self:faceDirection(startDir)
 end
 
-function Mover:goToPosition(targetPos, breakBlocks, order, doEachMove, doEachMoveArg)
+function Mover:goToPosition(targetPos, breakBlocks, order, doEachMove)
     self.log:debug(string.format('Moving to position %d x, %d y, %d z', targetPos.x, targetPos.y, targetPos.z))
-    self:goToPosition(targetPos - self.pos, breakBlocks, order, doEachMove, doEachMoveArg)
+    self:translate(targetPos - self.pos, breakBlocks, order, doEachMove)
 end
 
 -- Export
