@@ -5,11 +5,11 @@ function userPrompt.getNumber(description, default, min, max)
         print(description)
 
         if max and min then
-            print(string.format('Limit: %d <= n <= %d'), min, max)
+            print(string.format('Limit: %d <= n <= %d', min, max))
         elseif max then
-            print(string.format('Limit: n <= %d'), max)
+            print(string.format('Limit: n <= %d', max))
         elseif min then
-            print(string.format('Limit: n >= %d'), min)
+            print(string.format('Limit: n >= %d', min))
         end
 
         print('')
