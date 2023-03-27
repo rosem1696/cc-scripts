@@ -266,21 +266,21 @@ function Mover:translate(tVec, breakBlock, order, doEachMove)
     order = order or MovementOrder.XYZ
     local startDir = self.direction
     for i = 1, 3 do
-        if order[i] == 1 then -- X
+        if order[i] == 1 and tVec.x ~= 0 then -- X
             if tVec.x > 0 then
                 self:faceDirection(Direction.EAST)
             else
                 self:faceDirection(Direction.WEST)
             end
             self:lineForward(math.abs(tVec.x), breakBlock, doEachMove)
-        elseif order[i] == 3 then --Z
+        elseif order[i] == 3 and tVec.z ~= 0 then --Z
             if tVec.z > 0 then
                 self:faceDirection(Direction.SOUTH)
             else
                 self:faceDirection(Direction.NORTH)
             end
             self:lineForward(math.abs(tVec.z), breakBlock, doEachMove)
-        else -- Y
+        elseif order[i] == 3 and tVec.y ~= 0 then -- Y
             self:lineVertical(tVec.y, breakBlock, doEachMove)
         end
     end
