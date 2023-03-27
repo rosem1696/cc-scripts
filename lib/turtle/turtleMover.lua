@@ -280,7 +280,7 @@ function Mover:translate(tVec, breakBlock, order, doEachMove)
                 self:faceDirection(Direction.NORTH)
             end
             self:lineForward(math.abs(tVec.z), breakBlock, doEachMove)
-        elseif order[i] == 3 and tVec.y ~= 0 then -- Y
+        elseif order[i] == 2 and tVec.y ~= 0 then -- Y
             self:lineVertical(tVec.y, breakBlock, doEachMove)
         end
     end
