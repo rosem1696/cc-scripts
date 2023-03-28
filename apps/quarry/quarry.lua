@@ -3,13 +3,31 @@ local inv = require('turtleInventory')
 local log = require('log')
 local prompt = require('userPrompt')
 
--- Dig the pathway 2 blocks tall
+-- Dig the pathway 2 blocks tall and optionally dig stairs on vertical
 local doEachMovePath = {
-    func = function ()
+    digStairs = false
+}
+function doEachMovePath:func(mover, direction)
+    if direction == turtleMover.Direction.UP or
+        direction == turtleMover.Direction.DOWN
+    then
+        if self.digStairs then
+            mover:turnLeft()
+            mover:forward(true)
+            mover:turnRight()
+            mover:forward(true)
+            mover:turnRight()
+            mover:lineForward(2, true)
+            mover:turnRight()
+            mover:forward(true)
+            mover:turnRight()
+            mover:forward(true)
+        end
+        turtle.digDown()
+    else
         turtle.digDown()
     end
-}
-
+end
 
 local doEachMoveQuarry = {
     -- Used for handling the initial case if only digging 1 or 2 lines
@@ -33,14 +51,14 @@ function doEachMoveQuarry:func(mover)
 
             -- return to chest location
             mover:goToPosition(self.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
-            mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.ZXY)
+            mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.XYZ)
             mover:faceDirection(turtleMover.Direction.SOUTH)
 
             -- empty inventory
             inv.dropRange(2, 16)
 
             -- return to last position
-            mover:goToPosition(self.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
+            mover:goToPosition(self.quarryOrigin, true, turtleMover.MovementOrder.ZYX)
             mover:goToPosition(returnPosition, true, turtleMover.MovementOrder.ZXY)
             mover:faceDirection(returnDirection)
         end
@@ -66,7 +84,7 @@ end
 
 local function quarry(mover, length, width, height, quarryOrigin)
     doEachMoveQuarry.quarryOrigin = quarryOrigin
-    mover:goToPosition(quarryOrigin, true, turtleMover.MovementOrder.YXZ, doEachMovePath)
+    mover:goToPosition(quarryOrigin, true, turtleMover.MovementOrder.ZYX, doEachMovePath)
     local i = 0
 
     -- Handle special case for first row since we start one block lower than after finishing an iteration.
@@ -116,17 +134,20 @@ local function getArgs()
     local dx = prompt.getNumber('Select X coordinate \n\t(positive is right from the turtle)', 0, nil, nil)
     local dy = prompt.getNumber('Select Y coordinate \n\t(positive is up from the turtle)', 0, nil, nil)
 
+    local digStairs = prompt.getYesNo('Dig stairs on vertical route to quarry?', false)
     local useDebug = prompt.getYesNo('Use Debug Logging?', false)
 
     dz = dz * -1 -- Invert entered Z
-    return length, width, height, vector.new(dx, dy, dz), useDebug
+    return length, width, height, vector.new(dx, dy, dz), digStairs, useDebug
 end
 
 local function main()
     print('Starting Custom Quarry')
     print('====================')
 
-    local length, width, height, origin, useDebug = getArgs()
+    local length, width, height, origin, digStairs, useDebug = getArgs()
+
+    doEachMovePath.digStairs = digStairs
 
     local logLevel = log.LogLevel.ERROR
     if useDebug then logLevel = log.LogLevel.DEBUG end
