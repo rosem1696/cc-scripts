@@ -1,6 +1,7 @@
 local userPrompt = {}
 
 function userPrompt.getNumber(description, default, min, max)
+    term.clear()
     while true do
         print(description)
 
@@ -21,7 +22,8 @@ function userPrompt.getNumber(description, default, min, max)
         end
 
         local input = io.read('l')
-        print('')
+        os.sleep(0.5)
+        term.clear()
 
         if input == '' and default then
             return default
@@ -29,21 +31,19 @@ function userPrompt.getNumber(description, default, min, max)
 
         local inputNum = tonumber(input)
         if not inputNum then
-            printError('Input is not a number')
+            printError('Input is not a number\n')
         elseif (max and max < inputNum) or (min and min > inputNum) then
-            printError('Input is not within range')
+            printError('Input is not within range\n')
         else
             return inputNum
         end
-
-        print('')
     end
 end
 
 function userPrompt.getYesNo(description, default)
+    term.clear()
     while (true) do
-        print(description)
-        print('')
+        print(description + '\n')
 
         local defaultString = ''
         if default ~= nil then
@@ -54,7 +54,8 @@ function userPrompt.getYesNo(description, default)
         end
 
         local input = io.read('l')
-        print('')
+        os.sleep(0.5)
+        term.clear()
 
         if input == '' and default ~= nil then
             return default
@@ -63,10 +64,8 @@ function userPrompt.getYesNo(description, default)
         elseif input == 'n' or input == 'N' then
             return false
         else
-            printError('Input is invalid')
+            printError('Input is invalid\n')
         end
-
-        print('')
     end
 end
 
