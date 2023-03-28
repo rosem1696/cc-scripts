@@ -115,7 +115,7 @@ local function quarry(mover, length, width, height, quarryOrigin)
 
     -- return to origin and dump inventory
     mover:goToPosition(doEachMoveQuarry.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
-    mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.ZXY)
+    mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.XYZ)
     mover:faceDirection(turtleMover.Direction.SOUTH)
     inv.dropRange(2, 16)
     mover:faceDirection(turtleMover.Direction.NORTH)
