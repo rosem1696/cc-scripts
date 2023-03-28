@@ -22,7 +22,6 @@ function userPrompt.getNumber(description, default, min, max)
         end
 
         local input = io.read('l')
-        os.sleep(0.25)
         term.clear()
 
         if input == '' and default then
@@ -55,7 +54,6 @@ function userPrompt.getYesNo(description, default)
         end
 
         local input = io.read('l')
-        os.sleep(0.25)
         term.clear()
 
         if input == '' and default ~= nil then
