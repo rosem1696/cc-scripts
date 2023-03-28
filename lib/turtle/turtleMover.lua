@@ -71,7 +71,7 @@ end
 
 -- Movement
 
-function Mover:down(breakBlock)
+function Mover:down(breakBlock, doEachMove)
     self.log:debug('detecting down')
     if turtle.detectDown() then
         if breakBlock or self.settings.alwaysBreak then
@@ -94,10 +94,13 @@ function Mover:down(breakBlock)
         return false
     end
     self.pos = self.pos + Direction.Vectors[Direction.DOWN]
+    if doEachMove then
+        doEachMove:func(self, Direction.DOWN)
+    end
     return true
 end
 
-function Mover:up(breakBlock)
+function Mover:up(breakBlock, doEachMove)
     self.log:debug('detecting up')
     if turtle.detectUp() then
         if breakBlock or self.settings.alwaysBreak then
@@ -120,10 +123,13 @@ function Mover:up(breakBlock)
         return false
     end
     self.pos = self.pos + Direction.Vectors[Direction.UP]
+    if doEachMove then
+        doEachMove:func(self, Direction.UP)
+    end
     return true
 end
 
-function Mover:forward(breakBlock)
+function Mover:forward(breakBlock, doEachMove)
     self.log:debug('detecting forward')
     if turtle.detect() then
         if breakBlock or self.settings.alwaysBreak then
@@ -146,6 +152,9 @@ function Mover:forward(breakBlock)
         return false
     end
     self.pos = self.pos + Direction.Vectors[self.direction]
+    if doEachMove then
+        doEachMove:func(self, self.direction)
+    end
     return true
 end
 
@@ -203,10 +212,7 @@ function Mover:lineForward(distance, breakBlock, doEachMove)
     end
     self.log:debug(string.format('Moving forward %d spaces', distance))
     for i = 1, distance do
-        self:forward(breakBlock)
-        if doEachMove then
-            doEachMove:func(self)
-        end
+        self:forward(breakBlock, doEachMove)
     end
 end
 
@@ -223,10 +229,7 @@ function Mover:lineVertical(distance, breakBlock, doEachMove)
     end
 
     for i = 1, math.abs(distance) do
-        moveFunc(self, breakBlock)
-        if doEachMove then
-            doEachMove:func(self)
-        end
+        moveFunc(self, breakBlock, doEachMove)
     end
 end
 
@@ -247,10 +250,7 @@ function Mover:walkRectangle(length, width, breakBlock, doEachMove)
             -- turn and start next lined
             if turnRight then self:turnRight() else self:turnLeft() end
 
-            self:forward(breakBlock)
-            if doEachMove then
-                doEachMove:func(doEachMove.arg, self)
-            end
+            self:forward(breakBlock, doEachMove)
 
             if turnRight then self:turnRight() else self:turnLeft() end
 
