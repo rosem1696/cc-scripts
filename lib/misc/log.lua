@@ -26,21 +26,21 @@ function Logger:addPrefix(msg)
     return string.format('%s: %s', self.prefix, msg)
 end
 
-function Logger:error(msg)
+function Logger:error(msg, ...)
     if self.logLevel >= LogLevel.ERROR then
-        printError(self:addPrefix(msg))
+        printError(self:addPrefix(string.format(msg, table.unpack(arg))))
     end
 end
 
-function Logger:info(msg)
+function Logger:info(msg, ...)
     if self.logLevel >= LogLevel.INFO then
-        print(self:addPrefix(msg))
+        print(self:addPrefix(string.format(msg, table.unpack(arg))))
     end
 end
 
-function Logger:debug(msg)
+function Logger:debug(msg, ...)
     if self.logLevel >= LogLevel.DEBUG then
-        print(self:addPrefix(msg))
+        print(self:addPrefix(string.format(msg, table.unpack(arg))))
     end
 end
 

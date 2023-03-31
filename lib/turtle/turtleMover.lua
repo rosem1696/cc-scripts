@@ -1,4 +1,5 @@
 local Log = require('log')
+local turtleConst = require('turtleConst')
 
 -- Constants
 
@@ -44,14 +45,18 @@ local MovementOrder = {
 -- Class
 
 local Mover = {
-    pos = vector.new(0, 0, 0),
-    direction = Direction.NORTH,
-    settings = {
-        alwaysBreak = false,
-        digSide = 'right'
-    },
     log = Log.Logger:new('Turtle Mover', Log.LogLevel.ERROR)
 }
+
+function Mover.defaultSettings()
+    return {
+        alwaysBreak = false,
+        attackOnMoveFail = true,
+        retryMove = true,
+        retryMax = 0,    -- no max
+        retryDelay = 0.5 -- seconds
+    }
+end
 
 function Mover:new(logLevel)
     local tm = {}
@@ -59,11 +64,9 @@ function Mover:new(logLevel)
     self.__index = self
     -- init properties
     self.pos = vector.new(0, 0, 0)
-    self.settings = {
-        alwaysBreak = false,
-        digSide = 'right'
-    }
-    if logLevel then
+    self.direction = Direction.NORTH
+    self.settings = self.defaultSettings()
+    if logLevel and logLevel ~= self.log.logLevel then
         self.log = Log.Logger:new('Turtle Mover', logLevel)
     end
     return tm
@@ -71,90 +74,85 @@ end
 
 -- Movement
 
-function Mover:down(breakBlock, doEachMove)
-    self.log:debug('detecting down')
-    if turtle.detectDown() then
-        if breakBlock or self.settings.alwaysBreak then
-            self.log:debug('path down blocked, breaking block')
-            local ret, err = turtle.digDown(self.settings.digSide)
-            if not ret then
+function Mover:move(action, breakBlock)
+    local success = false
+    local count = 0
+    while
+        not success and (                     -- stop if we moved
+        (not self.retryMove and count < 1) or -- only try once if retry is off
+        (self.settings.retryMove and          -- if retry is on, check if exceeded number of tries
+        (self.settings.retryMax == 0 or count <= self.settings.retryMax)))
+    do
+        if count > 0 then self.log:debug('retrying move %s', action.labels) end
+
+        self.log:debug('detecting %s', action.label)
+        if action.detect() then
+            if breakBlock or self.settings.alwaysBreak then
+                self.log:info('path %s blocked, breaking block', action.label)
+                local ret, err = action.dig()
+                if not ret then
+                    self.log:error(err)
+                end
+            else
+                self.log:error('path %s blocked, cannot move', action.label)
+            end
+        end
+
+        self.log:debug('moving %s', action.label)
+        local ret, err = action.move()
+        if not ret then
+            if self.settings.attackOnMoveFail then
+                self.log:info('path %s obstructed, trying attack')
+                local atk, atkErr = action.attack()
+            else
                 self.log:error(err)
-                return false
             end
         else
-            self.log:error('path down blocked, cannot move')
-            return false
+            success = true
         end
+
+        count = count + 1
+        os.sleep(self.settings.retryDelay)
     end
 
-    self.log:debug('moving down')
-    local ret, err = turtle.down()
-    if not ret then
-        self.log:error(err)
-        return false
+    return success
+end
+
+function Mover:down(breakBlock, doEachMove)
+    local success = self:move(turtleConst.TurtleAction.DOWN, breakBlock)
+    if success then
+        self.pos = self.pos + Direction.Vectors[Direction.DOWN]
+
+        if doEachMove then
+            doEachMove:func(self, Direction.DOWN)
+        end
     end
-    self.pos = self.pos + Direction.Vectors[Direction.DOWN]
-    if doEachMove then
-        doEachMove:func(self, Direction.DOWN)
-    end
-    return true
+    return success
 end
 
 function Mover:up(breakBlock, doEachMove)
-    self.log:debug('detecting up')
-    if turtle.detectUp() then
-        if breakBlock or self.settings.alwaysBreak then
-            self.log:debug('path up blocked, breaking block')
-            local ret, err = turtle.digUp(self.settings.digSide)
-            if not ret then
-                self.log:error(err)
-                return false
-            end
-        else
-            self.log:error('path up blocked, cannot move')
-            return false
+    local success = self:move(turtleConst.TurtleAction.DOWN, breakBlock)
+    if success then
+        self.pos = self.pos + Direction.Vectors[Direction.UP]
+        if doEachMove then
+            doEachMove:func(self, Direction.UP)
         end
     end
 
-    self.log:debug('moving up')
-    local ret, err = turtle.up()
-    if not ret then
-        self.log:error(err)
-        return false
-    end
-    self.pos = self.pos + Direction.Vectors[Direction.UP]
-    if doEachMove then
-        doEachMove:func(self, Direction.UP)
-    end
-    return true
+
+    return success
 end
 
 function Mover:forward(breakBlock, doEachMove)
-    self.log:debug('detecting forward')
-    if turtle.detect() then
-        if breakBlock or self.settings.alwaysBreak then
-            self.log:debug('path forward blocked, breaking block')
-            local ret, err = turtle.dig(self.settings.digSide)
-            if not ret then
-                self.log:error(err)
-                return false
-            end
-        else
-            self.log:error('path forward blocked, cannot move')
-            return false
+    local success = self:move(turtleConst.TurtleAction.FORWARD, breakBlock)
+    if success then
+        self.pos = self.pos + Direction.Vectors[self.direction]
+        if doEachMove then
+            doEachMove:func(self, self.direction)
         end
     end
 
-    self.log:debug('moving forward')
-    local ret, err = turtle.forward()
-    if not ret then
-        self.log:error(err)
-        return false
-    end
-    self.pos = self.pos + Direction.Vectors[self.direction]
-    if doEachMove then
-        doEachMove:func(self, self.direction)
-    end
+
     return true
 end
 
@@ -170,7 +168,7 @@ function Mover:turnLeft()
 
     local d = math.fmod(self.direction - 1, 5)
     if d == 0 then self.direction = 4 else self.direction = d end
-    self.log:debug(string.format('Now faceing %s', Direction.Names[self.direction]))
+    self.log:debug('Now faceing %s', Direction.Names[self.direction])
     return true
 end
 
@@ -184,13 +182,13 @@ function Mover:turnRight()
 
     local d = math.fmod(self.direction + 1, 5)
     if d == 0 then self.direction = 1 else self.direction = d end
-    self.log:debug(string.format('Now faceing %s', Direction.Names[self.direction]))
+    self.log:debug('Now faceing %s', Direction.Names[self.direction])
 
     return true
 end
 
 function Mover:faceDirection(targetDir)
-    self.log:debug(string.format('Turning from %s to %s', Direction.Names[self.direction], Direction.Names[targetDir]))
+    self.log:debug('Turning from %s to %s', Direction.Names[self.direction], Direction.Names[targetDir])
     local delta = targetDir - self.direction
     if delta == 1 or delta == -3 then
         self:turnRight()
@@ -210,7 +208,7 @@ function Mover:lineForward(distance, breakBlock, doEachMove)
     if (distance < 1) then
         return
     end
-    self.log:debug(string.format('Moving forward %d spaces', distance))
+    self.log:debug('Moving forward %d spaces', distance)
     for i = 1, distance do
         self:forward(breakBlock, doEachMove)
     end
@@ -221,10 +219,10 @@ function Mover:lineVertical(distance, breakBlock, doEachMove)
     if distance == 0 then
         return
     elseif distance > 0 then
-        self.log:debug(string.format('Moving up %d spaces', distance))
+        self.log:debug('Moving up %d spaces', distance)
         moveFunc = self.up
     else
-        self.log:debug(string.format('Moving down %d spaces', distance))
+        self.log:debug('Moving down %d spaces', distance)
         moveFunc = self.down
     end
 
@@ -240,7 +238,7 @@ end
 -- starting position is inside square
 -- Ending position differs between even and odd width
 function Mover:walkRectangle(length, width, breakBlock, doEachMove)
-    self.log:debug(string.format('Moving rectangle of %d lenght and %d width', length, width))
+    self.log:debug('Moving rectangle of %d lenght and %d width', length, width)
     local turnRight = true;
     for i = 1, width do
         -- move forward length, including current starting position
@@ -262,7 +260,7 @@ function Mover:walkRectangle(length, width, breakBlock, doEachMove)
 end
 
 function Mover:translate(tVec, breakBlock, order, doEachMove)
-    self.log:debug(string.format('Translating by %d x, %d y, %d z', tVec.x, tVec.y, tVec.z))
+    self.log:debug('Translating by %d x, %d y, %d z', tVec.x, tVec.y, tVec.z)
     order = order or MovementOrder.XYZ
     local startDir = self.direction
     for i = 1, 3 do
@@ -289,7 +287,7 @@ function Mover:translate(tVec, breakBlock, order, doEachMove)
 end
 
 function Mover:goToPosition(targetPos, breakBlocks, order, doEachMove)
-    self.log:debug(string.format('Moving to position %d x, %d y, %d z', targetPos.x, targetPos.y, targetPos.z))
+    self.log:debug('Moving to position %d x, %d y, %d z', targetPos.x, targetPos.y, targetPos.z)
     self:translate(targetPos - self.pos, breakBlocks, order, doEachMove)
 end
 

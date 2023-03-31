@@ -1,7 +1,9 @@
 local turtleMover = require('turtleMover')
-local inv = require('turtleInventory')
+local turtleInv = require('turtleInventory')
+local turtleConst = require('turtleConst')
 local log = require('log')
 local prompt = require('userPrompt')
+local inv = require('inventory')
 
 -- Dig the pathway 2 blocks tall and optionally dig stairs on vertical
 local doEachMovePath = {
@@ -42,27 +44,46 @@ function doEachMoveQuarry:func(mover)
     if self.breakBlockUp then turtle.digUp() end
 
     -- check inventory
-    if inv.isInventoryFull() then
-        inv.stackItems()
-        if inv.isInventoryFull() then
-            -- store current state
-            local returnDirection = mover.direction
-            local returnPosition = mover.pos
-
-            -- return to chest location
-            mover:goToPosition(self.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
-            mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.XYZ)
-            mover:faceDirection(turtleMover.Direction.SOUTH)
-
-            -- empty inventory
-            inv.dropRange(2, 16)
-
-            -- return to last position
-            mover:goToPosition(self.quarryOrigin, true, turtleMover.MovementOrder.ZYX)
-            mover:goToPosition(returnPosition, true, turtleMover.MovementOrder.ZXY)
-            mover:faceDirection(returnDirection)
+    if turtleInv.isInventoryFull() then
+        turtleInv.stackItems()
+        if turtleInv.isInventoryFull() then
+            self:emptyInventory(mover)
         end
     end
+end
+
+function doEachMoveQuarry:emptyInventory(mover)
+    -- find somewhere to put down the ender chest
+    local action
+    if self.breakBlockDown then
+        action = turtleConst.TurtleAction.DOWN
+    elseif self.breakBlockUp then
+        action = turtleConst.TurtleAction.UP
+    else
+        action = turtleConst.TurtleAction.FORWARD
+    end
+
+    -- place the ender chest, retry on failure
+    turtle.select(1)
+    local placed = false
+    while not placed do
+        if action.detect() then
+            action.dig()
+        end
+        if action.place() then
+            placed = true
+        else
+            os.sleep(0.5)
+            action.attack()
+        end
+    end
+
+    -- dump inventory into chest, waiting for availabe space
+    local enderChest = peripheral.wrap(action.peripheralName)
+    turtleInv.dropRangeWait(action, 2, 16)
+
+    -- recollect chest
+    action.dig()
 end
 
 local function digPlane(mover, length, width)
@@ -116,9 +137,8 @@ local function quarry(mover, length, width, height, quarryOrigin)
     -- return to origin and dump inventory
     mover:goToPosition(doEachMoveQuarry.quarryOrigin, true, turtleMover.MovementOrder.YXZ)
     mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.XYZ)
-    mover:faceDirection(turtleMover.Direction.SOUTH)
-    inv.dropRange(2, 16)
     mover:faceDirection(turtleMover.Direction.NORTH)
+    doEachMoveQuarry:emptyInventory(mover)
 end
 
 local function getArgs()

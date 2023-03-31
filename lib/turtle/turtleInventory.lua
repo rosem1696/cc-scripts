@@ -1,6 +1,8 @@
-local inv = {}
+local inventory = require('inventory')
 
-function inv.isInventoryFull()
+local turtleInventory = {}
+
+function turtleInventory.isInventoryFull()
     for i = 1, 16 do
         if turtle.getItemCount(i) == 0 then
             return false
@@ -11,7 +13,7 @@ function inv.isInventoryFull()
 end
 
 -- Fixes inventory scattering.
-function inv.stackItems()
+function turtleInventory.stackItems()
     -- Remember seen items
     local m = {}
 
@@ -58,7 +60,7 @@ function inv.stackItems()
     end
 end
 
-function inv.selectItem(name)
+function turtleInventory.selectItem(name)
     for i = 1, 16 do
         local data = turtle.getItemDetail(i)
         if data and data.name == name then
@@ -69,19 +71,34 @@ function inv.selectItem(name)
     return false
 end
 
-function inv.dropRange(startSlot, endSlot)
+function turtleInventory.dropRange(action, startSlot, endSlot)
     if startSlot > endSlot or startSlot < 1 or endSlot > 16 then
         return
     end
     for i = startSlot, endSlot do
         turtle.select(i)
-        turtle.drop()
+        action.drop()
+    end
+end
+
+function turtleInventory.dropRangeWait(action, startSlot, endSlot, inventory, delay)
+    if startSlot > endSlot or startSlot < 1 or endSlot > 16 then
+        return
+    end
+
+    delay = delay or 1
+    for i = startSlot, endSlot do
+        while not inventory.hasOpenSlot() do
+            sleep(delay)
+        end
+        turtle.select(i)
+        action.drop()
     end
 end
 
 -- Returns true if any fuel was added
 -- Returns the amount of fuel added
-function inv.refuelAny()
+function turtleInventory.refuelAny()
     local currentFuel = turtle.getFuelLevel()
     if currentFuel == turtle.getFuelLimit() then
         return true, 0
@@ -97,7 +114,7 @@ end
 
 -- Returns true if fuel was added or already at maximum
 -- Returns the amount of fuel added to the new driving force
-function inv.refuelAll()
+function turtleInventory.refuelAll()
     local currentFuel = turtle.getFuelLevel()
     if currentFuel == turtle.getFuelLimit() then
         return true, 0
@@ -113,4 +130,4 @@ function inv.refuelAll()
     return amount > 0, amount
 end
 
-return inv;
+return turtleInventory;

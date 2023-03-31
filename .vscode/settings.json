@@ -12,6 +12,7 @@
     "vector",
     "fs",
     "http",
-    "term"
+    "term",
+    "peripheral"
   ]
 }
