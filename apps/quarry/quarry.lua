@@ -80,7 +80,7 @@ function doEachMoveQuarry:emptyInventory(mover)
 
     -- dump inventory into chest, waiting for availabe space
     local enderChest = peripheral.wrap(action.peripheralName)
-    turtleInv.dropRangeWait(action, 2, 16)
+    turtleInv.dropRangeWait(action, 2, 16, enderChest)
 
     -- recollect chest
     action.dig()
