@@ -8,4 +8,4 @@ local function hasOpenSlot(inv)
 end
 
 
-return { hosOpenSlot = hasOpenSlot }
+return { hasOpenSlot = hasOpenSlot }

@@ -81,14 +81,14 @@ function turtleInventory.dropRange(action, startSlot, endSlot)
     end
 end
 
-function turtleInventory.dropRangeWait(action, startSlot, endSlot, inventory, delay)
+function turtleInventory.dropRangeWait(action, startSlot, endSlot, chest, delay)
     if startSlot > endSlot or startSlot < 1 or endSlot > 16 then
         return
     end
 
     delay = delay or 1
     for i = startSlot, endSlot do
-        while not inventory.hasOpenSlot() do
+        while not inventory.hasOpenSlot(chest) do
             sleep(delay)
         end
         turtle.select(i)
