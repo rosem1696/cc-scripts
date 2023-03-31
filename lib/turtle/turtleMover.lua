@@ -131,7 +131,7 @@ function Mover:down(breakBlock, doEachMove)
 end
 
 function Mover:up(breakBlock, doEachMove)
-    local success = self:move(turtleConst.TurtleAction.DOWN, breakBlock)
+    local success = self:move(turtleConst.TurtleAction.UP, breakBlock)
     if success then
         self.pos = self.pos + Direction.Vectors[Direction.UP]
         if doEachMove then
