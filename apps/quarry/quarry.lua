@@ -82,10 +82,12 @@ function doEachMoveQuarry:emptyInventory(mover)
     local enderChest = peripheral.wrap(action.peripheralName)
     turtleInv.dropRangeWait(action, 3, 16, enderChest)
 
-    if turtle.getFuelLevel < 40000 then
+    -- Do simple fuel check
+    if turtle.getFuelLevel() < 40000 then
         turtle.select(3)
         turtle.refuel(1)
     end
+
     -- recollect chest
     turtle.select(1)
     action.dig()
