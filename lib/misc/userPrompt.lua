@@ -68,4 +68,28 @@ function userPrompt.getYesNo(description, default)
     end
 end
 
+function userPrompt.getString(description, default)
+    term.clear()
+    while (true) do
+        print(description)
+        print('')
+        if default then
+            write(string.format('Enter text<default = %s>: ', default))
+        else
+            write('Enter text: ')
+        end
+
+        local input = io.read('l')
+        term.clear()
+
+        if input == '' and default ~= nil then
+            return default
+        elseif input ~= '' then
+            return input
+        else
+            printError('Input is invalid\n')
+        end
+    end
+end
+
 return userPrompt

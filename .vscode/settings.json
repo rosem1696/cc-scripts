@@ -13,6 +13,7 @@
     "fs",
     "http",
     "term",
-    "peripheral"
+    "peripheral",
+    "textutils"
   ]
 }

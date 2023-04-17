@@ -12,7 +12,7 @@ local Direction = {
     DOWN = 6,
 }
 
-local DirectionVectors = {
+Direction.Vectors = {
     [Direction.NORTH] = vector.new(0, 0, -1),
     [Direction.EAST] = vector.new(1, 0, 0),
     [Direction.SOUTH] = vector.new(0, 0, 1),
@@ -21,7 +21,7 @@ local DirectionVectors = {
     [Direction.DOWN] = vector.new(0, -1, 0),
 }
 
-local DirectionNames = {
+Direction.Names = {
     [Direction.NORTH] = 'North',
     [Direction.EAST] = 'East',
     [Direction.SOUTH] = 'South',
@@ -30,8 +30,38 @@ local DirectionNames = {
     [Direction.DOWN] = 'Down',
 }
 
-Direction.Vectors = DirectionVectors;
-Direction.Names = DirectionNames;
+function Direction:fromName(name)
+    for i = self.NORTH, self.WEST do
+        if string.lower(self.Names[i]) == string.lower(name) then
+            return i
+        end
+    end
+    return nil
+end
+
+function Direction:relativeFromAbsolute(perspective, absolute)
+    if perspective < self.NORTH or
+        absolute < self.NORTH or
+        perspective > self.WEST or
+        absolute > self.WEST
+    then
+        return nil
+    end
+
+    return (absolute - perspective) % 4 + 1
+end
+
+function Direction:relativePos(vec, perspective)
+    if perspective == self.EAST then
+        return vector.new(vec.z, vec.y, -1 * vec.x)
+    elseif perspective == self.SOUTH then
+        return vector.new(-1 * vec.x, vec.y, -1 * vec.z)
+    elseif perspective == self.WEST then
+        return vector.new(-1 * vec.z, vec.y, vec.x)
+    else
+        return vec
+    end
+end
 
 local MovementOrder = {
     XYZ = { 1, 2, 3 },
