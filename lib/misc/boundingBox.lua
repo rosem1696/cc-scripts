@@ -5,8 +5,8 @@ function BoundingBox:fromPoints(point1, point2)
     setmetatable(box, self)
     self.__index = self
     -- init properties
-    self.min = self.findMin(point1, point2)
-    self.max = self.findMax(point1, point2)
+    box.min = self.findMin(point1, point2)
+    box.max = self.findMax(point1, point2)
     return box
 end
 
