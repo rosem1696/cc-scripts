@@ -1,3 +1,7 @@
+if turtle == nil then
+    turtle = require('turtleStub')
+end
+
 local TurtleAction = {
     UP = {
         label = 'up',

@@ -7,10 +7,9 @@ local prompt = require('userPrompt')
 local blockFilter = require('blockFilter')
 local turtleMover = require('turtleMover')
 local boundingBox = require('boundingBox')
+local Log = require('log')
 
-local scanRadius = vector.new(8, 8, 8)
-
-local defaultFilter = blockFilter:new()
+local defaultFilter = blockFilter.BlockFilter:new()
 defaultFilter:add('minecraft:air', nil, true)
 defaultFilter:add('minecraft:stone', nil, true)
 defaultFilter:add('minecraft:dirt', nil, true)
@@ -20,10 +19,10 @@ local Scanner = {}
 
 function Scanner:getScanner()
     if turtle.sim then
-        self.blockScanner = require('scanerStub')
+        self.blockScanner = require('scanStub')
+    else
+        self.blockScanner = peripheral.find('plethora:scanner')
     end
-    self.blockScanner = peripheral.find('plethora:scanner')
-    return self.blockScanner ~= nil;
 end
 
 function Scanner:getFilter()
@@ -34,9 +33,9 @@ function Scanner:getFilter()
 end
 
 function Scanner:getScanSize()
-    local length = prompt.getNumber('Select scan area length', nil, 0, nil)
-    local width = prompt.getNumber('Select scan area width ', nil, 0, nil)
-    local height = prompt.getNumber('Select scan area height', nil, 0, nil)
+    local length = prompt.getNumber('Select scan area length', nil, 1, nil)
+    local width = prompt.getNumber('Select scan area width ', nil, 1, nil)
+    local height = prompt.getNumber('Select scan area height', nil, 1, nil)
     self.areaSize = vector.new(width, height, length)
 end
 
@@ -50,6 +49,11 @@ end
 function Scanner:getPatternName()
     local patternName = prompt.getString('Select the name to store this pattern as', 'scanPattern')
     self.patternFile = patternName .. '.pat'
+    self.log:debug('Pattern file is %s', self.patternFile)
+end
+
+function Scanner:getLog()
+    self.log = Log.Logger:new('Scan', Log.LogLevel.DEBUG)
 end
 
 function Scanner:findInitialDirection()
@@ -58,7 +62,7 @@ function Scanner:findInitialDirection()
         return false
     end
 
-    self.initialDirection = turtleMover.Direction.fromName(meta.state.faceing)
+    self.initialDirection = turtleMover.Direction:fromName(meta.state.faceing)
     if self.initialDirection == nil then
         return false
     end
@@ -80,7 +84,10 @@ function Scanner:moveToStartingPosition()
 end
 
 function Scanner:init()
-    if not self:getScanner() then
+    self:getLog()
+
+    self:getScanner()
+    if not self.blockScanner then
         print('No block scanner found')
         return false
     end
@@ -90,6 +97,7 @@ function Scanner:init()
     self:setScanAreaBounds()
     self:getPatternName()
     self:getFilter()
+
 
     self.mover = turtleMover.Mover:new()
     self.pattern = pattern.Pattern:new()
@@ -103,9 +111,12 @@ function Scanner:init()
 end
 
 function Scanner:doScan()
+    self.log:debug('Scanning at pos <%d, %d, %d>', self.mover.pos.x, self.mover.pos.y, self.mover.pos.z)
     local blocks = self.blockScanner.scan()
-    for index, block in blocks do
+    for index, block in pairs(blocks) do
+        --self.log:debug('Process Block <%d, %d, %d>', block.x, block.y, block.z)
         if self.filter:get(block.name, block.metadata) ~= nil then
+            self.log:debug('Process Block <%d, %d, %d>', block.x, block.y, block.z)
             local blockRelative = turtleMover.Direction:relativePos(vector.new(block.x, block.y, block.z),
                 self.initialDirection)
             local positionInPattern = blockRelative + self.mover.pos - self.origin
@@ -121,14 +132,10 @@ function Scanner:doScan()
     end
 end
 
--- function Scanner:finishedScanning()
---     return self.scannedArea.includes(self.bounds.min) and
---         self.scannedArea.includes(self.bounds.max)
--- end
-
 local doEachMoveScan = {}
 
 function doEachMoveScan:func(mover, direciton)
+    self.log:debug('Walking forward and scanning')
     mover:lineForward(7, true)
     Scanner:doScan()
 end
@@ -139,6 +146,7 @@ function Scanner:scanArea()
     local numHeight = math.ceil(self.areaSize.y / 8)
 
     for y = 1, numHeight do
+        self.log:debug('Walking rectangle %d x %d at height %d', numLength, numWidth, y)
         self:doScan()
         self.mover:walkRectangle(numLength, numWidth, true, doEachMoveScan)
 
@@ -153,11 +161,14 @@ function Scanner:scanArea()
             self.mover:turnRight()
             self.mover:turnRight()
         end
+
+        self.log:debug('Finished rectangle, moving up', numLength, numWidth, y)
+        self.mover:lineVertical(8, true)
     end
 end
 
 function Scanner:writePattern()
-    local patFile = fs.open(self.patternFile)
+    local patFile = fs.open(self.patternFile, 'w')
     patFile.write(self.pattern:serialize())
     patFile.close()
 end

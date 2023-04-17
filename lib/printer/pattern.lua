@@ -10,13 +10,13 @@ function Pattern.emptyPatternData()
 end
 
 function Pattern:new()
-    local p = {}
-    setmetatable(p, self)
+    local pattern = {}
+    setmetatable(pattern, self)
     self.__index = self
     -- init properties
-    self.data = self.emptyPatternData()
-    self.inkNameCache = blockFilter.BlockFilter:new()
-    return p
+    pattern.data = self.emptyPatternData()
+    pattern.inkNameCache = blockFilter.BlockFilter:new()
+    return pattern
 end
 
 function Pattern.unserialize(patternStr)

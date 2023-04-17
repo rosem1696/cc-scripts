@@ -13,9 +13,9 @@ turtle = {
     detect = reTrue,
     detectUp = reTrue,
     detectDown = reTrue,
-    move = reTrue,
-    moveUp = reTrue,
-    moveDown = reTrue,
+    forward = reTrue,
+    up = reTrue,
+    down = reTrue,
     turnRight = reTrue,
     turnLeft = reTrue,
     select = reTrue,
@@ -29,3 +29,5 @@ end
 function turtle.getFuelLimit()
     return 1000000
 end
+
+return turtle

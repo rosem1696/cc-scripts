@@ -1,3 +1,6 @@
+if turtle == nil then
+    turtle = require('turtleStub')
+end
 local inventory = require('inventory')
 
 local turtleInventory = {}

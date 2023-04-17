@@ -1,3 +1,7 @@
+if turtle == nil then
+    turtle = require('turtleStub')
+end
+
 local Log = require('log')
 local turtleConst = require('turtleConst')
 
@@ -48,7 +52,7 @@ function Direction:relativeFromAbsolute(perspective, absolute)
         return nil
     end
 
-    return (absolute - perspective) % 4 + 1
+    return ((absolute - perspective) % 4) + 1
 end
 
 function Direction:relativePos(vec, perspective)
@@ -93,11 +97,11 @@ function Mover:new(logLevel)
     setmetatable(tm, self)
     self.__index = self
     -- init properties
-    self.pos = vector.new(0, 0, 0)
-    self.direction = Direction.NORTH
-    self.settings = self.defaultSettings()
+    tm.pos = vector.new(0, 0, 0)
+    tm.direction = Direction.NORTH
+    tm.settings = self.defaultSettings()
     if logLevel and logLevel ~= self.log.logLevel then
-        self.log = Log.Logger:new('Turtle Mover', logLevel)
+        tm.log = Log.Logger:new('Turtle Mover', logLevel)
     end
     return tm
 end

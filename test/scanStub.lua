@@ -18,6 +18,7 @@ function scanner.scan()
             end
         end
     end
+    return blocks
 end
 
 function scanner.getBlockMeta(x, y, z)
@@ -27,3 +28,5 @@ function scanner.getBlockMeta(x, y, z)
         }
     }
 end
+
+return scanner

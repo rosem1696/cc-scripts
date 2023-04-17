@@ -11,12 +11,12 @@ Logger = {
 }
 
 function Logger:new(prefix, level)
-    local o = {}
-    setmetatable(o, self)
+    local log = {}
+    setmetatable(log, self)
     self.__index = self
-    self.prefix = prefix or ''
-    self.logLevel = level or LogLevel.ERROR
-    return o
+    log.prefix = prefix or ''
+    log.logLevel = level or LogLevel.ERROR
+    return log
 end
 
 function Logger:addPrefix(msg)
