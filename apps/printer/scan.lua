@@ -71,12 +71,14 @@ function Scanner:findInitialDirection()
 end
 
 function Scanner:setScanAreaBounds()
-    self.bounds = boundingBox.BoundingBox:fromSize(self.origin, self.areaSize)
-    self.scannedArea = boundingBox.BoundingBox:fromSize(self.origin, vector.new(0, 0, 0))
+    local farPos = self.origin + vector.new(self.areaSize.x - 1, self.areaSize.y - 1, (self.areaSize.z - 1) * -1)
+    self.log:debug('origin: <%d, %d, %d> - far: <%d, %d, %d>', self.origin.x, self.origin.y, self.origin.z,
+        farPos.x, farPos.y, farPos.z)
+    self.bounds = boundingBox.BoundingBox:fromPoints(self.origin, farPos)
 end
 
 function Scanner:moveToScanStart()
-    self.mover:translate(self.origin, true, turtleMover.MovementOrder.XYZ)
+    self.mover:translate(self.origin + vector.new(-1, -1, 1), true, turtleMover.MovementOrder.XYZ)
 end
 
 function Scanner:moveToStartingPosition()
@@ -94,10 +96,9 @@ function Scanner:init()
 
     self:getScanSize()
     self:getScanOrigin()
-    self:setScanAreaBounds()
     self:getPatternName()
     self:getFilter()
-
+    self:setScanAreaBounds()
 
     self.mover = turtleMover.Mover:new()
     self.pattern = pattern.Pattern:new()
@@ -114,19 +115,28 @@ function Scanner:doScan()
     self.log:debug('Scanning at pos <%d, %d, %d>', self.mover.pos.x, self.mover.pos.y, self.mover.pos.z)
     local blocks = self.blockScanner.scan()
     for index, block in pairs(blocks) do
-        --self.log:debug('Process Block <%d, %d, %d>', block.x, block.y, block.z)
-        if self.filter:get(block.name, block.metadata) ~= nil then
-            self.log:debug('Process Block <%d, %d, %d>', block.x, block.y, block.z)
+        if self.filter:get(block.name, block.metadata) == nil then
+            -- Calculate the relative position of the block to the turtle, oriented to the initial direction
             local blockRelative = turtleMover.Direction:relativePos(vector.new(block.x, block.y, block.z),
                 self.initialDirection)
-            local positionInPattern = blockRelative + self.mover.pos - self.origin
-            if self.bounds:includes(positionInPattern) then
-                local posMeta = {}
-                if (block.state ~= nil and block.state.faceing ~= nil) then
-                    posMeta.direction = turtleMover.Direction:relativeFromAbsolute(self.initialDirection,
-                        turtleMover.Direction:fromName(block.state.faceing))
+            -- only use blocks in the top right quadrant of the scanner
+            if blockRelative.x >= 1 and blockRelative.y >= 1 and blockRelative.z <= -1 then
+                -- Calculate the absolute position of the block, oriented to the initial direction
+                local absolutePos = blockRelative + self.mover.pos
+                if self.bounds:includes(absolutePos) then
+                    -- Calculate the position of the block in the pattern (origin = <0,0,0>)
+                    local posInPattern = absolutePos - self.origin
+                    -- If the block has an orientation, save it in the metadata
+                    local posMeta = {}
+                    if (block.state ~= nil and block.state.faceing ~= nil) then
+                        posMeta.direction = turtleMover.Direction:relativeFromAbsolute(self.initialDirection,
+                            turtleMover.Direction:fromName(block.state.faceing))
+                    end
+                    -- Add this block's data and position to the pattern
+                    self.log:debug('%s:<%d> - <%d, %d, %d>', block.name, block.metadata, posInPattern.x, posInPattern.y,
+                        posInPattern.z)
+                    self.pattern:addPoint(posInPattern, posMeta, block.name, block.metadata)
                 end
-                self.pattern:addPoint(positionInPattern, posMeta, block.name, block.metadata)
             end
         end
     end
@@ -135,12 +145,14 @@ end
 local doEachMoveScan = {}
 
 function doEachMoveScan:func(mover, direciton)
-    self.log:debug('Walking forward and scanning')
+    Scanner.log:debug('Walking forward and scanning')
     mover:lineForward(7, true)
     Scanner:doScan()
 end
 
 function Scanner:scanArea()
+    self.log:debug('bounds: <%d, %d, %d> - <%d, %d, %d>', self.bounds.min.x, self.bounds.min.y, self.bounds.min.z,
+        self.bounds.max.x, self.bounds.max.y, self.bounds.max.z)
     local numLength = math.ceil(self.areaSize.z / 8)
     local numWidth = math.ceil(self.areaSize.x / 8)
     local numHeight = math.ceil(self.areaSize.y / 8)
@@ -162,8 +174,11 @@ function Scanner:scanArea()
             self.mover:turnRight()
         end
 
-        self.log:debug('Finished rectangle, moving up', numLength, numWidth, y)
-        self.mover:lineVertical(8, true)
+        self.log:debug('Finished rectangle')
+        if y < numHeight then
+            self.log:debug('Moving up')
+            self.mover:lineVertical(8, true)
+        end
     end
 end
 
