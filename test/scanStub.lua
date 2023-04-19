@@ -11,7 +11,7 @@ function scanner.scan()
                     y = y,
                     z = z,
                     state = {
-                        faceing = 'south'
+                        facing = 'south'
                     },
                     metadata = 0
                 }
@@ -24,7 +24,7 @@ end
 function scanner.getBlockMeta(x, y, z)
     return {
         state = {
-            faceing = 'north'
+            facing = 'north'
         }
     }
 end

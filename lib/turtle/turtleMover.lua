@@ -202,7 +202,7 @@ function Mover:turnLeft()
 
     local d = math.fmod(self.direction - 1, 5)
     if d == 0 then self.direction = 4 else self.direction = d end
-    self.log:debug('Now faceing %s', Direction.Names[self.direction])
+    self.log:debug('Now facing %s', Direction.Names[self.direction])
     return true
 end
 
@@ -216,7 +216,7 @@ function Mover:turnRight()
 
     local d = math.fmod(self.direction + 1, 5)
     if d == 0 then self.direction = 1 else self.direction = d end
-    self.log:debug('Now faceing %s', Direction.Names[self.direction])
+    self.log:debug('Now facing %s', Direction.Names[self.direction])
 
     return true
 end

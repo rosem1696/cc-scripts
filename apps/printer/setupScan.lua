@@ -1,5 +1,5 @@
 -- https://pastebin.com/0gNcU8jq
--- pastebin get setup
+-- pastebin get 0gNcU8jq setup
 -- Download from github
 
 local UrlBase = 'https://raw.githubusercontent.com/rosem1696/cc-scripts/main'

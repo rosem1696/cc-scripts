@@ -57,12 +57,12 @@ function Scanner:getLog()
 end
 
 function Scanner:findInitialDirection()
-    local meta = self.blockScanner.getBlockMeta(0, 1, 0)
-    if (meta == nil or meta.state == nil or meta.state.faceing == nil) then
+    local meta = self.blockScanner.getBlockMeta(0, 0, 0)
+    if (meta == nil or meta.state == nil or meta.state.facing == nil) then
         return false
     end
 
-    self.initialDirection = turtleMover.Direction:fromName(meta.state.faceing)
+    self.initialDirection = turtleMover.Direction:fromName(meta.state.facing)
     if self.initialDirection == nil then
         return false
     end
@@ -128,9 +128,9 @@ function Scanner:doScan()
                     local posInPattern = absolutePos - self.origin
                     -- If the block has an orientation, save it in the metadata
                     local posMeta = {}
-                    if (block.state ~= nil and block.state.faceing ~= nil) then
+                    if (block.state ~= nil and block.state.facing ~= nil) then
                         posMeta.direction = turtleMover.Direction:relativeFromAbsolute(self.initialDirection,
-                            turtleMover.Direction:fromName(block.state.faceing))
+                            turtleMover.Direction:fromName(block.state.facing))
                     end
                     -- Add this block's data and position to the pattern
                     self.log:debug('%s:<%d> - <%d, %d, %d>', block.name, block.metadata, posInPattern.x, posInPattern.y,
