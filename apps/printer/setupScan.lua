@@ -1,5 +1,5 @@
--- https://pastebin.com/
--- pastebin get  setup
+-- https://pastebin.com/0gNcU8jq
+-- pastebin get setup
 -- Download from github
 
 local UrlBase = 'https://raw.githubusercontent.com/rosem1696/cc-scripts/main'
@@ -17,23 +17,18 @@ local function main()
     -- misc
     download('log', 'lib/misc')
     download('userPrompt', 'lib/misc')
+    download('boundingBox', 'lib/misc')
+
     -- turtle
     download('turtleConst', 'lib/turtle')
-    -- download('turtleMover', 'lib/turtle')
-    -- download('turtleInventory', 'lib/turtle')
-    --inventory
-    -- download('inventory', 'lib/inventory')
+    download('turtleMover', 'lib/turtle')
+    download('turtleInventory', 'lib/turtle')
+
     -- printer
     download('blockFilter', 'lib/printer')
     download('pattern', 'lib/printer')
 
-    -- download test stubs
-    if turtle == nil then
-        download('turtleStub', 'test')
-        download('scanStub', 'test')
-    end
-
-    -- download('quarry', 'apps/quarry')
+    -- app
     download('scan', 'apps/printer')
 
     print('Download finished!')
