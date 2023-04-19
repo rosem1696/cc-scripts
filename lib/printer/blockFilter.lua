@@ -1,4 +1,15 @@
-local function getKey(name, meta)
+local BlockFilter = {}
+
+function BlockFilter:new()
+    local filter = {}
+    setmetatable(filter, self)
+    self.__index = self
+    filter.filter = {}
+    -- init properties
+    return filter
+end
+
+function BlockFilter.getKey(name, meta)
     if meta ~= nil then
         return string.format('%s-%d', name, meta)
     else
@@ -6,30 +17,24 @@ local function getKey(name, meta)
     end
 end
 
-local BlockFilter = {}
-
-function BlockFilter:new()
-    local filter = {}
-    setmetatable(filter, self)
-    self.__index = self
-    -- init properties
-    return filter
-end
-
 function BlockFilter:add(name, meta, value)
-    self[getKey(name, meta)] = value
+    local key = BlockFilter.getKey(name, meta)
+    self.filter[key] = value
 end
 
 function BlockFilter:remove(name, meta)
-    self[getKey(name, meta)] = nil
+    local key = BlockFilter.getKey(name, meta)
+    self.filter[key] = nil
 end
 
 function BlockFilter:get(name, meta)
-    local val = self[getKey(name, nil)]
+    local key = BlockFilter.getKey(name, nil)
+    local val = self.filter[key]
 
     if val ~= nil then return val end
 
-    return self[getKey(name, meta)]
+    key = BlockFilter.getKey(name, meta)
+    return self.filter[key]
 end
 
 return { BlockFilter = BlockFilter }

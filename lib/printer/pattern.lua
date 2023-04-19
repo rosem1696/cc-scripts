@@ -41,7 +41,7 @@ function Pattern:setPos(vec, i, meta)
 end
 
 function Pattern:getPos(vec)
-    if self.data.model[vec.x] == nil or self.data.model[vec.x][vec.y] then
+    if self.data.model[vec.x] == nil or self.data.model[vec.x][vec.y] == nil then
         return nil
     end
 
@@ -53,18 +53,10 @@ function Pattern:inkCount()
 end
 
 function Pattern:updateInkCache(index, name, meta)
-    if self.inkNameCache.get(name, meta) == nil then
-        self.inkNameCache[name] = {}
-    end
-    if self.inkNameCache[name][meta] == nil then
-        self.inkNameCache[name][meta] = {}
-    end
-
     local indexes = self.inkNameCache:get(name, meta)
     if indexes == nil then
-        indexes = {}
-        indexes[1] = index
-        self.inkNameCache:add(name, meta)
+        indexes = { index }
+        self.inkNameCache:add(name, meta, indexes)
     else
         indexes[#indexes + 1] = index
     end
@@ -103,7 +95,7 @@ function Pattern:addPoint(vec, posMeta, name, inkMeta)
 end
 
 function Pattern:serialize()
-    return textutils.serialize(self.data)
+    return textutils.serialize(self.data, { compact = true, allow_repetitions = true })
 end
 
 return { Pattern = Pattern }

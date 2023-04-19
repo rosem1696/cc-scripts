@@ -2,6 +2,10 @@ local function reTrue()
     return true
 end
 
+local function reFalse()
+    return true
+end
+
 turtle = {
     sim = true,
     dig = reTrue,
@@ -10,9 +14,9 @@ turtle = {
     attack = reTrue,
     attackUp = reTrue,
     attackDown = reTrue,
-    detect = reTrue,
-    detectUp = reTrue,
-    detectDown = reTrue,
+    detect = reFalse,
+    detectUp = reFalse,
+    detectDown = reFalse,
     forward = reTrue,
     up = reTrue,
     down = reTrue,

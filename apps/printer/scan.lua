@@ -13,6 +13,7 @@ local defaultFilter = blockFilter.BlockFilter:new()
 defaultFilter:add('minecraft:air', nil, true)
 defaultFilter:add('minecraft:stone', nil, true)
 defaultFilter:add('minecraft:dirt', nil, true)
+defaultFilter:add('minecraft:grass', nil, true)
 defaultFilter:add('minecraft:coal_ore', nil, true)
 
 local Scanner = {}
@@ -78,11 +79,12 @@ function Scanner:setScanAreaBounds()
 end
 
 function Scanner:moveToScanStart()
-    self.mover:translate(self.origin + vector.new(-1, -1, 1), true, turtleMover.MovementOrder.XYZ)
+    self.mover:goToPosition(self.origin + vector.new(-1, -1, 1), true, turtleMover.MovementOrder.XYZ)
 end
 
 function Scanner:moveToStartingPosition()
-    self.mover:translate(vector.new(0, 0, 0), true, turtleMover.MovementOrder.ZYX)
+    self.mover:goToPosition(vector.new(0, 0, 0), true, turtleMover.MovementOrder.ZYX)
+    self.mover:faceDirection(turtleMover.Direction.NORTH)
 end
 
 function Scanner:init()
