@@ -74,9 +74,9 @@ function userPrompt.getString(description, default)
         print(description)
         print('')
         if default then
-            write(string.format('Enter text<default = %s>: ', default))
+            write(string.format('Enter text<default = %s>\n: ', default))
         else
-            write('Enter text: ')
+            write('Enter text\n: ')
         end
 
         local input = io.read('l')
@@ -88,6 +88,37 @@ function userPrompt.getString(description, default)
             return input
         else
             printError('Input is invalid\n')
+        end
+    end
+end
+
+function userPrompt.getSelection(description, list, defaultIndex)
+    term.clear()
+    while (true) do
+        print(description)
+        print('')
+        for i, item in pairs(list) do
+            print(string.format('%d - %s', i, item))
+        end
+
+        if defaultIndex then
+            print(string.format('<default = %s>', list[defaultIndex]))
+        end
+        write('Select: ')
+
+        local input = io.read('l')
+        term.clear()
+
+        if input == '' and defaultIndex ~= nil then
+            return list[defaultIndex]
+        end
+
+        local index = tonumber(input)
+
+        if not index or index < 1 or index > #list then
+            printError('Invalid selection\n')
+        else
+            return list[index]
         end
     end
 end

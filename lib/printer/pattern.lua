@@ -1,11 +1,15 @@
 local blockFilter = require('blockFilter')
+local prompt = require('userPrompt')
+local boundingBox = require('boundingBox')
+-- Init
 
 local Pattern = {}
 
 function Pattern.emptyPatternData()
     return {
         ink = {},
-        model = {}
+        model = {},
+        bounds = boundingBox.BoundingBox:new()
     }
 end
 
@@ -19,14 +23,7 @@ function Pattern:new()
     return pattern
 end
 
-function Pattern.unserialize(patternStr)
-    local pattern = Pattern:new()
-    pattern.data = textutils.unserialize(patternStr)
-    for i = 1, #pattern.data.ink do
-        pattern:updateInkCache(pattern.data.ink[i].name, pattern.data.ink.meta)
-    end
-    return pattern
-end
+-- Primary Function
 
 function Pattern:setPos(vec, i, meta)
     if self.data.model[vec.x] == nil then
@@ -38,6 +35,7 @@ function Pattern:setPos(vec, i, meta)
     end
 
     self.data.model[vec.x][vec.y][vec.z] = { i = i, meta = meta };
+    self.bounds:updateToInclude(vec)
 end
 
 function Pattern:getPos(vec)
@@ -94,8 +92,86 @@ function Pattern:addPoint(vec, posMeta, name, inkMeta)
     self:setPos(vec, index, posMeta)
 end
 
+function Pattern:getSize()
+    return self.bounds:getSize()
+end
+
+function Pattern:normalize()
+    local min = boundingBox.BoundingBox.min
+    local oldModel = self.data.model
+    self.data.model = {}
+    self.data.bounds = boundingBox.BoundingBox:new()
+    for x, xPoints in pairs(oldModel) do
+        for y, yPoints in pairs(xPoints) do
+            for z, point in pairs(yPoints) do
+                local newPos = vector.new(x, y, z) - min
+                self:setPos(newPos, point.i, point.meta)
+            end
+        end
+    end
+end
+
+-- Utility functions
+
 function Pattern:serialize()
     return textutils.serialize(self.data, { compact = true, allow_repetitions = true })
+end
+
+function Pattern:writeFile(name)
+    if Pattern.extractFromExtension(name) == nil then
+        name = Pattern.addExtension(name)
+    end
+    local patFile = fs.open(name, 'w')
+    patFile.write(self:serialize())
+    patFile.close()
+end
+
+function Pattern.unserialize(patternStr)
+    local pattern = Pattern:new()
+    pattern.data = textutils.unserialize(patternStr)
+    for i = 1, #pattern.data.ink do
+        pattern:updateInkCache(i, pattern.data.ink[i].name, pattern.data.ink.meta)
+    end
+    return pattern
+end
+
+function Pattern.fromFile(name)
+    if Pattern.extractFromExtension(name) == nil then
+        name = Pattern.addExtension(name)
+    end
+    local patFile = fs.open(name, 'r')
+    local patStr = patFile.readAll()
+    patFile.close()
+
+    return Pattern.unserialize(patStr)
+end
+
+function Pattern.addExtension(name)
+    return string.format('%s.pat', name)
+end
+
+function Pattern.extractFromExtension(filename)
+    return filename:match('(.*)%.pat')
+end
+
+function Pattern.getPatterns()
+    local patterns = {}
+    for _, f in pairs(fs.list('/')) do
+        local patName = Pattern.extractFromExtension(f)
+        if patName ~= nil then
+            patterns[#patterns + 1] = patName
+        end
+    end
+    return patterns
+end
+
+function Pattern.selectPattern()
+    local patterns = Pattern.getPatterns()
+    if (#patterns == 0) then
+        error('No available patterns')
+        return nil
+    end
+    return prompt.getSelection('Select pattern', patterns)
 end
 
 return { Pattern = Pattern }

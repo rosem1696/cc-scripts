@@ -30,6 +30,7 @@ local function main()
 
     -- app
     download('scan', 'apps/printer')
+    download('updateInk', 'apps/printer')
 
     print('Download finished!')
 end

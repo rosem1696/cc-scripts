@@ -133,4 +133,30 @@ function turtleInventory.refuelAll()
     return amount > 0, amount
 end
 
+function turtleInventory.findItem(name, meta, firstIndex, lastIndex)
+    if firstIndex == nil then firstIndex = 1 end
+    if lastIndex == nil then lastIndex = 16 end
+
+    for i = firstIndex, lastIndex do
+        turtle.select(i)
+        local item = turtle.getItemDetail()
+        if item.name == name and (item.damage == meta or meta == nil) then
+            return i
+        end
+    end
+    return nil
+end
+
+function turtleInventory.findOpenSlot(firstIndex, lastIndex)
+    if firstIndex == nil then firstIndex = 1 end
+    if lastIndex == nil then lastIndex = 16 end
+
+    for i = firstIndex, lastIndex do
+        turtle.select(i)
+        if turtle.getItemDetail == nil then return i end
+    end
+
+    return nil
+end
+
 return turtleInventory;

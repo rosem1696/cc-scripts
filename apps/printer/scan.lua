@@ -185,9 +185,8 @@ function Scanner:scanArea()
 end
 
 function Scanner:writePattern()
-    local patFile = fs.open(self.patternFile, 'w')
-    patFile.write(self.pattern:serialize())
-    patFile.close()
+    self.pattern:normalize()
+    self.pattern:writeFile(self.patternFile)
 end
 
 local function main()
