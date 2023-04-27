@@ -138,9 +138,8 @@ function turtleInventory.findItem(name, meta, firstIndex, lastIndex)
     if lastIndex == nil then lastIndex = 16 end
 
     for i = firstIndex, lastIndex do
-        turtle.select(i)
-        local item = turtle.getItemDetail()
-        if item.name == name and (item.damage == meta or meta == nil) then
+        local item = turtle.getItemDetail(i)
+        if item ~= name and item.name == name and (item.damage == meta or meta == nil) then
             return i
         end
     end
@@ -152,8 +151,7 @@ function turtleInventory.findOpenSlot(firstIndex, lastIndex)
     if lastIndex == nil then lastIndex = 16 end
 
     for i = firstIndex, lastIndex do
-        turtle.select(i)
-        if turtle.getItemDetail == nil then return i end
+        if turtle.getItemDetail(i) == nil then return i end
     end
 
     return nil

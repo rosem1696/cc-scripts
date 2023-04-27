@@ -20,8 +20,7 @@ function selectInk(ink)
 
         if slot == nil then
             for i = 2, 16 do
-                turtle.select(i)
-                local item = turtle.getItemDetail()
+                local item = turtle.getItemDetail(i)
                 if Printer.doEachPattern.pattern:getFirstInkIndex(item.name, item.damage) == nil then
                     turtle.drop()
                 end
@@ -42,7 +41,7 @@ function selectInk(ink)
         -- transfer ink from ender chest to inventory
         turtle.select(1)
         turtle.placeUp()
-        local inkChest = peripheral.wrap('up')
+        local inkChest = peripheral.wrap('top')
 
         -- wait for the item to exist in the chest
         while inventory.findBlock(inkChest, ink.name, ink.meta) == nil do

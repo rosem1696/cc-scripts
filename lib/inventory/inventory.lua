@@ -10,7 +10,7 @@ local function hasOpenSlot(inv)
 end
 
 local function itemsInSlot(inv, slot)
-    return inv.getItemDetail(slot).count
+    return inv.getItemMeta(slot).count
 end
 
 local function findBlock(inv, name, meta)
