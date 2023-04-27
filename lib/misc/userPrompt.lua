@@ -123,4 +123,13 @@ function userPrompt.getSelection(description, list, defaultIndex)
     end
 end
 
+function userPrompt.pressEnter()
+    print('')
+    print('Press Enter to Continue')
+    print('')
+
+    local n = io.read('l')
+    term.clear()
+end
+
 return userPrompt
