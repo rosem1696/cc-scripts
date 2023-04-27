@@ -102,14 +102,14 @@ function Pattern:getSize()
 end
 
 function Pattern:normalize()
-    local min = self.bounds.min
+    local newOrigin = self.bounds:getLSW()
     local oldModel = self.data.model
     self.data.model = {}
-    self.data.bounds = nil
+    self.bounds = nil
     for x, xPoints in pairs(oldModel) do
         for y, yPoints in pairs(xPoints) do
             for z, point in pairs(yPoints) do
-                local newPos = vector.new(x, y, z) - min
+                local newPos = vector.new(x, y, z) - newOrigin
                 self:setPos(newPos, point.i, point.meta)
             end
         end
@@ -117,6 +117,17 @@ function Pattern:normalize()
 end
 
 -- Utility functions
+
+function Pattern:printPoints()
+    for x, xPoints in pairs(self.data.model) do
+        for y, yPoints in pairs(xPoints) do
+            for z, point in pairs(yPoints) do
+                self.print(string.format('<%d, %d, %d> - %s - %d', x, y, z, self:getInk(point.i).name,
+                    self:getInk(point.i).meta))
+            end
+        end
+    end
+end
 
 function Pattern:serialize()
     return textutils.serialize(self.data, { compact = true, allow_repetitions = true })

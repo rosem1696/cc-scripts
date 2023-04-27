@@ -37,6 +37,40 @@ function BoundingBox:updateToInclude(point)
     end
 end
 
+function BoundingBox:getLSW()
+    return vector.new(self.min.x, self.min.y, self.max.z)
+end
+
+function BoundingBox:getLSE()
+    return vector.new(self.max.x, self.min.y, self.max.z)
+end
+
+function BoundingBox:getLNW()
+    return self.min
+end
+
+function BoundingBox:getLNE()
+    return vector.new(self.max.x, self.min.y, self.min.z)
+end
+
+function BoundingBox:getUSW()
+    return vector.new(self.min.x, self.max.y, self.max.z)
+end
+
+function BoundingBox:getUSE()
+    return self.max
+end
+
+function BoundingBox:getUNW()
+    return vector.new(self.min.x, self.max.y, self.min.z)
+end
+
+function BoundingBox:getUNE()
+    return vector.new(self.max.x, self.max.y, self.min.z)
+end
+
+-- utility
+
 function BoundingBox.findMin(vec1, vec2)
     local xmin = math.min(vec1.x, vec2.x)
     local ymin = math.min(vec1.y, vec2.y)
