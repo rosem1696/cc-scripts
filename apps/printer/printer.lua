@@ -83,10 +83,10 @@ end
 
 function Printer.printPattern(pattern)
     Printer.doEachPattern.pattern = pattern
-
-    local length = pattern.size.z
-    local width = pattern.size.x
-    local height = pattern.size.y
+    local size = pattern:getSize()
+    local length = size.z
+    local width = size.x
+    local height = size.y
     for i = 1, height do
         Printer.mover:walkRectangle(length, width, true, Printer.doEachPattern)
 
