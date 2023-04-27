@@ -122,7 +122,7 @@ function Pattern:printPoints()
     for x, xPoints in pairs(self.data.model) do
         for y, yPoints in pairs(xPoints) do
             for z, point in pairs(yPoints) do
-                self.print(string.format('<%d, %d, %d> - %s - %d', x, y, z, self:getInk(point.i).name,
+                print(string.format('<%d, %d, %d> - %s - %d', x, y, z, self:getInk(point.i).name,
                     self:getInk(point.i).meta))
             end
         end
