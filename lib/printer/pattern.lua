@@ -135,7 +135,7 @@ function Pattern.unserialize(patternStr)
     local pattern = Pattern:new()
     pattern.data = textutils.unserialize(patternStr)
     for i = 1, #pattern.data.ink do
-        pattern:updateInkCache(i, pattern.data.ink[i].name, pattern.data.ink.meta)
+        pattern:updateInkCache(i, pattern.data.ink[i].name, pattern.data.ink[i].meta)
     end
 
     for x, xPoints in pairs(pattern.data.model) do
