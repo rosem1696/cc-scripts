@@ -35,7 +35,7 @@ Direction.Names = {
 }
 
 function Direction:fromName(name)
-    for i = self.NORTH, self.WEST do
+    for i = self.NORTH, self.DOWN do
         if string.lower(self.Names[i]) == string.lower(name) then
             return i
         end
@@ -113,9 +113,9 @@ function Mover:move(action, breakBlock)
     local count = 0
     while
         not success and (                     -- stop if we moved
-        (not self.retryMove and count < 1) or -- only try once if retry is off
-        (self.settings.retryMove and          -- if retry is on, check if exceeded number of tries
-        (self.settings.retryMax == 0 or count <= self.settings.retryMax)))
+            (not self.retryMove and count < 1) or -- only try once if retry is off
+            (self.settings.retryMove and      -- if retry is on, check if exceeded number of tries
+                (self.settings.retryMax == 0 or count <= self.settings.retryMax)))
     do
         if count > 0 then self.log:debug('retrying move %s', action.labels) end
 

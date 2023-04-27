@@ -31,6 +31,7 @@ function selectInk(ink)
             if slot == nil then
                 -- TODO put ink at 16 back in chest
                 turtle.select(1)
+                turtle.digUp()
                 turtle.placeUp()
                 turtle.select(16)
                 turtle.dropUp()
@@ -40,6 +41,7 @@ function selectInk(ink)
         end
         -- transfer ink from ender chest to inventory
         turtle.select(1)
+        turtle.digUp()
         turtle.placeUp()
         local inkChest = peripheral.wrap('top')
 
@@ -56,6 +58,11 @@ end
 function Printer.doEachPattern:func(mover, direction)
     local posInPattern = Printer.mover.pos - Printer.doEachPattern.patOrigin
     local block = Printer.doEachPattern.pattern:getPos(posInPattern)
+
+    if block == nil then
+        return
+    end
+
     local ink = Printer.doEachPattern.pattern:getInk(block.i)
     selectInk(ink)
     turtle.digDown()
@@ -102,29 +109,32 @@ function Printer.printPattern(pattern)
             Printer.mover:turnRight()
         end
 
-        turtleMover.Mover:up(true, Printer.doEachPattern)
+        Printer.mover:up(true, Printer.doEachPattern)
     end
 end
 
 function Printer.doStep(i)
     Printer.proj:loadPattern(i)
     local step = Printer.proj:getStep(i)
-    for i = 1, step.repeatCount do
-        Printer.printPattern(pattern)
+    for j = 1, step.repeatCount do
+        Printer.printPattern(step.pattern)
         local translate
         -- determine
-        if step.dir == turtleMover.Direction.NORTH then
-            translate = vector.new(0, pattern.size.z * -1, 0)
-        elseif step.dir == turtleMover.Direction.SOUTH then
-            translate = vector.new(0, pattern.size.z, 0)
-        elseif step.dir == turtleMover.Direction.EAST then
-            translate = vector.new(pattern.size.x, 0, 0)
-        elseif step.dir == turtleMover.Direction.WEST then
-            translate = vector.new(pattern.size.x * -1, 0, 0)
-        elseif step.dir == turtleMover.Direction.UP then
-            translate = vector.new(0, 0, pattern.size.y)
+        local size = step.pattern:getSize()
+        if step.direction == turtleMover.Direction.NORTH then
+            translate = vector.new(0, 0, size.z * -1)
+        elseif step.direction == turtleMover.Direction.SOUTH then
+            translate = vector.new(0, 0, size.z)
+        elseif step.direction == turtleMover.Direction.EAST then
+            translate = vector.new(size.x, 0, 0)
+        elseif step.direction == turtleMover.Direction.WEST then
+            translate = vector.new(size.x * -1, 0, 0)
+        elseif step.direction == turtleMover.Direction.UP then
+            translate = vector.new(0, size.y, 0)
         end
+
         Printer.doEachPattern.patOrigin = Printer.doEachPattern.patOrigin + translate
+        Printer.mover:faceDirection(turtleMover.Direction.NORTH)
         Printer.mover:goToPosition(Printer.doEachPattern.patOrigin, true, turtleMover.MovementOrder.ZXY)
     end
 end
@@ -132,6 +142,7 @@ end
 function Printer:print()
     Printer.mover = turtleMover.Mover:new()
     Printer.getProject()
+    Printer.getOrigin()
     Printer.doEachPattern.patOrigin = Printer.origin
     for i = 1, Printer.proj:numSteps() do
         Printer.doStep(i)

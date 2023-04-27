@@ -139,7 +139,7 @@ function turtleInventory.findItem(name, meta, firstIndex, lastIndex)
 
     for i = firstIndex, lastIndex do
         local item = turtle.getItemDetail(i)
-        if item ~= name and item.name == name and (item.damage == meta or meta == nil) then
+        if item ~= nil and item.name == name and (item.damage == meta or meta == nil) then
             return i
         end
     end
