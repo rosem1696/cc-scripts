@@ -130,7 +130,7 @@ function Printer.doStep(i)
 end
 
 function Printer:print()
-    Printer.mover = turtleMover:new()
+    Printer.mover = turtleMover.Mover:new()
     Printer.getProject()
     Printer.doEachPattern.patOrigin = Printer.origin
     for i = 1, Printer.proj:numSteps() do

@@ -37,7 +37,7 @@ end
 
 function Project:loadPattern(index)
     local step = self.steps[index]
-    if Project:patternLoaded(index) then
+    if self:patternLoaded(index) then
         return self.steps[index].pattern
     end
 
