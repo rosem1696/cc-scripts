@@ -88,6 +88,10 @@ function Printer.getOrigin()
     Printer.origin = vector.new(dx, dy, dz)
 end
 
+function Printer.goToOrigin()
+    Printer.mover:goToPosition(Printer.origin, true, turtleMover.MovementOrder.ZXY)
+end
+
 function Printer.printPattern(pattern)
     Printer.doEachPattern.pattern = pattern
     local size = pattern:getSize()
@@ -95,6 +99,7 @@ function Printer.printPattern(pattern)
     local width = size.x
     local height = size.y
     for i = 1, height do
+        Printer.doEachPattern:func(Printer.mover, Printer.mover.direction)
         Printer.mover:walkRectangle(length, width, true, Printer.doEachPattern)
 
         -- Handle ending orientation being different
@@ -143,6 +148,7 @@ function Printer:print()
     Printer.mover = turtleMover.Mover:new()
     Printer.getProject()
     Printer.getOrigin()
+    Printer.goToOrigin()
     Printer.doEachPattern.patOrigin = Printer.origin
     for i = 1, Printer.proj:numSteps() do
         Printer.doStep(i)
