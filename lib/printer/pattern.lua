@@ -138,7 +138,18 @@ function Pattern.unserialize(patternStr)
         pattern:updateInkCache(i, pattern.data.ink[i].name, pattern.data.ink.meta)
     end
 
-    pattern:normalize()
+    for x, xPoints in pairs(pattern.data.model) do
+        for y, yPoints in pairs(xPoints) do
+            for z, point in pairs(yPoints) do
+                local vec = vector.new(x, y, z)
+                if pattern.bounds == nil then
+                    pattern.bounds = boundingBox.BoundingBox:fromPoints(vec, vec)
+                else
+                    pattern.bounds:updateToInclude(vec)
+                end
+            end
+        end
+    end
     return pattern
 end
 
