@@ -60,7 +60,14 @@ function Printer.doEachPattern:func(mover, direction)
     local ink = Printer.doEachPattern.pattern:getInk(block.i)
     selectInk(ink)
     turtle.digDown()
-    turtle.placeDown()
+    if (block.meta.direction ~= nil) then
+        local currentDir = Printer.mover.direction
+        Printer.mover:faceDirection(block.meta.direction)
+        turtle.placeDown()
+        Printer.mover:faceDirection(currentDir)
+    else
+        turtle.placeDown()
+    end
 end
 
 function Printer.getProject()
