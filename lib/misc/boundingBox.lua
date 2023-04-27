@@ -1,3 +1,5 @@
+local oneVec = vector.new(1, 1, 1)
+
 local BoundingBox = {}
 
 function BoundingBox:fromPoints(point1, point2)
@@ -11,11 +13,11 @@ function BoundingBox:fromPoints(point1, point2)
 end
 
 function BoundingBox:fromSize(point, size)
-    return self:fromPoints(point, point + size)
+    return self:fromPoints(point, point + size - oneVec)
 end
 
 function BoundingBox:getSize()
-    return self.max - self.min
+    return self.max - self.min + oneVec
 end
 
 function BoundingBox:includes(point)
