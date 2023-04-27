@@ -2,9 +2,17 @@ local pattern = require('pattern')
 local prompt = require('userPrompt')
 
 local function getInkInput(ink)
-    local updateName = prompt.getYesNo(string.format(
-        'Ink: name = %s, meta = %d\nUpdate ink name?',
-        ink.name, ink.meta), false)
+    local updateName
+    if ink.meta == nil then
+        updateName = prompt.getYesNo(string.format(
+            'Ink: name = %s, meta = nil\nUpdate ink name?',
+            ink.name), false)
+    else
+        updateName = prompt.getYesNo(string.format(
+            'Ink: name = %s, meta = %d\nUpdate ink name?',
+            ink.name, ink.meta), false)
+    end
+
     if updateName then
         ink.name = prompt.getString('Enter new ink name', ink.name)
     end
