@@ -9,7 +9,7 @@ function Pattern.emptyPatternData()
     return {
         ink = {},
         model = {},
-        bounds = boundingBox.BoundingBox:new()
+        bounds = nil
     }
 end
 
@@ -35,7 +35,12 @@ function Pattern:setPos(vec, i, meta)
     end
 
     self.data.model[vec.x][vec.y][vec.z] = { i = i, meta = meta };
-    self.bounds:updateToInclude(vec)
+
+    if (self.bounds == nil) then
+        self.bounds = boundingBox.BoundingBox:fromPoints(vec, vec)
+    else
+        self.bounds:updateToInclude(vec)
+    end
 end
 
 function Pattern:getPos(vec)
@@ -97,10 +102,10 @@ function Pattern:getSize()
 end
 
 function Pattern:normalize()
-    local min = boundingBox.BoundingBox.min
+    local min = self.bounds.min
     local oldModel = self.data.model
     self.data.model = {}
-    self.data.bounds = boundingBox.BoundingBox:new()
+    self.data.bounds = nil
     for x, xPoints in pairs(oldModel) do
         for y, yPoints in pairs(xPoints) do
             for z, point in pairs(yPoints) do
@@ -132,6 +137,8 @@ function Pattern.unserialize(patternStr)
     for i = 1, #pattern.data.ink do
         pattern:updateInkCache(i, pattern.data.ink[i].name, pattern.data.ink.meta)
     end
+
+    pattern:normalize()
     return pattern
 end
 

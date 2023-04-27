@@ -24,13 +24,19 @@ local function main()
     download('turtleMover', 'lib/turtle')
     download('turtleInventory', 'lib/turtle')
 
+    -- inventory
+    download('inventory', 'lib/turtle')
+
     -- printer
     download('blockFilter', 'lib/printer')
     download('pattern', 'lib/printer')
+    download('project', 'lib/printer')
 
     -- app
     download('scan', 'apps/printer')
     download('updateInk', 'apps/printer')
+    download('makeProject', 'apps/printer')
+    download('printer', 'apps/printer')
 
     print('Download finished!')
 end
