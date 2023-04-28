@@ -36,6 +36,7 @@ local function main()
     download('scan', 'apps/printer')
     download('updateInk', 'apps/printer')
     download('makeProject', 'apps/printer')
+    download('projectMaterials', 'apps/printer')
     download('printer', 'apps/printer')
 
     print('Download finished!')
