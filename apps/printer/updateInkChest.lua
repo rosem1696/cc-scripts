@@ -4,7 +4,7 @@ local inventory = require('inventory')
 local turtleMover = require('turtleMover')
 
 local inkChest = peripheral.wrap('top')
-local editChest = peripheral.wrap('down')
+local editChest = peripheral.wrap('bottom')
 
 local function moveInk(ink)
     if inventory.findBlock(inkChest, ink.name, ink.meta) ~= nil then
