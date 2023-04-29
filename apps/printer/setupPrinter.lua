@@ -25,7 +25,7 @@ local function main()
     download('turtleInventory', 'lib/turtle')
 
     -- inventory
-    download('inventory', 'lib/turtle')
+    download('inventory', 'lib/inventory')
 
     -- printer
     download('blockFilter', 'lib/printer')
@@ -35,6 +35,7 @@ local function main()
     -- app
     download('scan', 'apps/printer')
     download('updateInk', 'apps/printer')
+    download('betterUpdateInk', 'apps/printer')
     download('makeProject', 'apps/printer')
     download('projectMaterials', 'apps/printer')
     download('printer', 'apps/printer')
