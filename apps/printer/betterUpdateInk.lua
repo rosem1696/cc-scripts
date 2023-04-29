@@ -45,7 +45,7 @@ local function getInkInput(ink)
 
     local item = turtle.getItemDetail(1)
     ink.name = item.name
-    ink.damage = item.damage
+    ink.meta = item.damage
 
     turtle.dig()
 
@@ -79,6 +79,13 @@ local function updateInk()
     for i = 1, pattern:inkCount() do
         local ink = pattern:getInk(i)
         getInkInput(ink)
+    end
+
+    for i = 1, 16 do
+        if turtle.getItemDetail(i) ~= nil then
+            turtle.select(i)
+            turtle.dropUp()
+        end
     end
 
     patternName = prompt.getString('Enter file name to save pattern as', patternName)
