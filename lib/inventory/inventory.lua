@@ -15,7 +15,7 @@ end
 
 local function findBlock(inv, name, meta)
     for slot, item in pairs(inv.list()) do
-        if item.name == name and item.damage == meta then
+        if item.name == name and (meta == nil or item.damage == meta) then
             return slot
         end
     end
