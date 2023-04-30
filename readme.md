@@ -1,1 +1,1 @@
-# My Computer Craft Scripts
+# Computer Craft Scripts
